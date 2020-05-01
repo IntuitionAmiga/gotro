@@ -2,6 +2,7 @@ package main
 
 import (
 	"fmt"
+	"math"
 	"os"
 	"time"
 
@@ -118,11 +119,13 @@ func main() {
 
 	//Start intro
 	showKickstart(renderer)
+
 	playFloppySounds()
 	time.Sleep(time.Second * 2)
 	surface.FillRect(nil, sdl.MapRGB(surface.Format, 255, 255, 255)) // Fill bg with white
 	window.UpdateSurface()
 	time.Sleep(time.Second * 9)
+
 	playMusic()
 
 	var i int32
@@ -183,7 +186,73 @@ func main() {
 		window.UpdateSurface()
 	}
 
+	//drawCircle(window, surface, 100, 100, 80, 255, 255, 255)
+	//drawCircle2(window, renderer, 80, 60, 80)
+	drawCircleBres(window, renderer, 100, 100, 80)
 	time.Sleep(time.Second * 3)
 	window.Destroy()
 	sdl.Quit()
+}
+
+func putPixel(window *sdl.Window, surface *sdl.Surface, xpos, ypos int32, R, G, B uint8) {
+	surface.FillRect(&sdl.Rect{xpos, ypos, 1, 1}, sdl.MapRGB(surface.Format, R, G, B))
+	window.UpdateSurface()
+}
+
+func drawCircle(window *sdl.Window, surface *sdl.Surface, x, y, radius float64, R, G, B uint8) {
+	var i, angle, x1, y1 float64
+
+	for i = 0; i < 360; i += 0.1 {
+		angle = i
+		x1 = radius * math.Cos(angle*math.Pi/180)
+		y1 = radius * math.Sin(angle*math.Pi/180)
+		putPixel(window, surface, int32(x)+int32(x1), int32(y)+int32(y1), R, G, B)
+	}
+}
+
+func putPixel2(window *sdl.Window, renderer *sdl.Renderer, xpos, ypos int32, R, G, B uint8) {
+	renderer.SetDrawColor(R, G, B, 255)
+	renderer.DrawPoint(xpos, ypos)
+	renderer.Present()
+}
+
+func drawCircle2(window *sdl.Window, renderer *sdl.Renderer, x, y, radius float64) {
+	//const pi float64 = 3.1415926535
+	var i, angle, x1, y1 float64
+
+	for i = 0; i < 360; i += 0.1 {
+		angle = i
+		x1 = radius * math.Cos(angle*math.Pi/180)
+		y1 = radius * math.Sin(angle*math.Pi/180)
+		putPixel2(window, renderer, int32(x)+int32(x1), int32(y)+int32(y1), 255, 255, 255)
+	}
+}
+
+func drawCircle3(window *sdl.Window, renderer *sdl.Renderer, xc, yc, x, y int32, R, G, B uint8) {
+	putPixel2(window, renderer, xc+x, yc+y, R, G, B)
+	putPixel2(window, renderer, xc-x, yc+y, R, G, B)
+	putPixel2(window, renderer, xc+x, yc-y, R, G, B)
+	putPixel2(window, renderer, xc-x, yc-y, R, G, B)
+	putPixel2(window, renderer, xc+y, yc+x, R, G, B)
+	putPixel2(window, renderer, xc-y, yc+x, R, G, B)
+	putPixel2(window, renderer, xc+y, yc-x, R, G, B)
+	putPixel2(window, renderer, xc-y, yc-x, R, G, B)
+}
+
+func drawCircleBres(window *sdl.Window, renderer *sdl.Renderer, xc, yc, r int32) {
+	var x int32 = 0
+	var y int32 = r
+	var decision int32 = 3 - (2 * r)
+
+	for y >= x {
+		x++
+		if decision > 0 {
+			y--
+			decision = decision + 4*(x-y) + 10
+		} else {
+			decision = decision + 4*x + 6
+			drawCircle3(window, renderer, xc, yc, x, y, 255, 255, 255)
+			time.Sleep(time.Second / 2880)
+		}
+	}
 }
