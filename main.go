@@ -117,6 +117,9 @@ func main() {
 		os.Exit(1)
 	}
 
+	//MacOS won't draw the window with this line
+	var _ sdl.Event = sdl.PollEvent()
+
 	//Start intro
 	showKickstart(renderer)
 
