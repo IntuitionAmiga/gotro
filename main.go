@@ -12,82 +12,6 @@ import (
 
 const windowWidth, windowHeight = 800, 600
 
-func sdlInitVideo() {
-	err := sdl.Init(sdl.INIT_VIDEO)
-	if err != nil {
-		_, _ = fmt.Fprintf(os.Stderr, "Failed to initialise video: %s\n", err)
-		os.Exit(1)
-	}
-}
-
-func playMusic() {
-	errSDLAudioInit := sdl.Init(sdl.INIT_AUDIO)
-	if errSDLAudioInit != nil {
-		_, _ = fmt.Fprintf(os.Stderr, "Failed to initialise audio: %s\n", errSDLAudioInit)
-		os.Exit(1)
-	}
-
-	errOpeningAudioDevice := mix.OpenAudio(22050, mix.DEFAULT_FORMAT, 2, 4096)
-	if errOpeningAudioDevice != nil {
-		_, _ = fmt.Fprintf(os.Stderr, "Failed to open audio device: %s\n", errOpeningAudioDevice)
-		os.Exit(1)
-	}
-
-	errSDLMixerInit := mix.Init(mix.INIT_MP3)
-	if errSDLMixerInit != nil {
-		_, _ = fmt.Fprintf(os.Stderr, "Failed to initialise mixer: %s\n", errSDLMixerInit)
-		os.Exit(1)
-	}
-
-	if music, errLoadingMusic := mix.LoadMUS("despair4mat.mp3"); errLoadingMusic != nil {
-		_, _ = fmt.Fprintf(os.Stderr, "Failed to load music from disk: %s\n", errLoadingMusic)
-		os.Exit(1)
-	} else {
-		_ = music.Play(1)
-	}
-}
-
-func playFloppySounds() {
-	errSDLAudioInit := sdl.Init(sdl.INIT_AUDIO)
-	if errSDLAudioInit != nil {
-		_, _ = fmt.Fprintf(os.Stderr, "Failed to initialise audio: %s\n", errSDLAudioInit)
-		os.Exit(1)
-	}
-
-	errOpeningAudioDevice := mix.OpenAudio(22050, mix.DEFAULT_FORMAT, 2, 4096)
-	if errOpeningAudioDevice != nil {
-		_, _ = fmt.Fprintf(os.Stderr, "Failed to open audio device: %s\n", errOpeningAudioDevice)
-		os.Exit(1)
-	}
-
-	errSDLMixerInit := mix.Init(mix.INIT_MP3)
-	if errSDLMixerInit != nil {
-		_, _ = fmt.Fprintf(os.Stderr, "Failed to initialise mixer: %s\n", errSDLMixerInit)
-		os.Exit(1)
-	}
-
-	if music, errLoadingMusic := mix.LoadMUS("./floppy.mp3"); errLoadingMusic != nil {
-		_, _ = fmt.Fprintf(os.Stderr, "Failed to load music from disk: %s\n", errLoadingMusic)
-		os.Exit(1)
-	} else {
-		_ = music.Play(1)
-	}
-}
-
-func showKickstart(kickRenderer *sdl.Renderer) error {
-	_ = kickRenderer.Clear()
-
-	t, err := img.LoadTexture(kickRenderer, "kick13.png")
-	if err != nil {
-		return fmt.Errorf("couldn't load image from disk")
-	}
-	if err := kickRenderer.Copy(t, nil, nil); err != nil {
-		return fmt.Errorf("couldn't copy texture: %v", err)
-	}
-	kickRenderer.Present()
-	return err
-}
-
 func main() {
 	//Setup video and audio
 	sdlInitVideo()
@@ -116,7 +40,7 @@ func main() {
 		os.Exit(1)
 	}
 
-	//MacOS won't draw the window with this line
+	//MacOS won't draw the window without this line
 	var _ = sdl.PollEvent()
 
 	//Start intro
@@ -124,12 +48,107 @@ func main() {
 
 	playFloppySounds()
 	time.Sleep(time.Second * 2)
-	_ = surface.FillRect(nil, sdl.MapRGB(surface.Format, 255, 255, 255)) // Fill bg with white
-	_ = window.UpdateSurface()
+
+	backgroundFill(window, surface)
 	time.Sleep(time.Second * 9)
 
 	playMusic()
 
+	wipeToLeft(window, surface)
+	wipeToRight(window, surface)
+
+	horizontalBars(window, surface)
+	horizontalBars2(window, surface)
+
+	wipeTopDown(window, surface)
+	drawCircle(renderer, 100, 100, 80, 255, 255, 255)
+	time.Sleep(time.Second * 3)
+
+	_ = window.Destroy()
+	sdl.Quit()
+}
+func sdlInitVideo() {
+	err := sdl.Init(sdl.INIT_VIDEO)
+	if err != nil {
+		_, _ = fmt.Fprintf(os.Stderr, "Failed to initialise video: %s\n", err)
+		os.Exit(1)
+	}
+}
+func showKickstart(kickRenderer *sdl.Renderer) error {
+	_ = kickRenderer.Clear()
+
+	t, err := img.LoadTexture(kickRenderer, "kick13.png")
+	if err != nil {
+		return fmt.Errorf("couldn't load image from disk")
+	}
+	if err := kickRenderer.Copy(t, nil, nil); err != nil {
+		return fmt.Errorf("couldn't copy texture: %v", err)
+	}
+	kickRenderer.Present()
+	return err
+}
+func playFloppySounds() {
+	errSDLAudioInit := sdl.Init(sdl.INIT_AUDIO)
+	if errSDLAudioInit != nil {
+		_, _ = fmt.Fprintf(os.Stderr, "Failed to initialise audio: %s\n", errSDLAudioInit)
+		os.Exit(1)
+	}
+
+	errOpeningAudioDevice := mix.OpenAudio(22050, mix.DEFAULT_FORMAT, 2, 4096)
+	if errOpeningAudioDevice != nil {
+		_, _ = fmt.Fprintf(os.Stderr, "Failed to open audio device: %s\n", errOpeningAudioDevice)
+		os.Exit(1)
+	}
+
+	errSDLMixerInit := mix.Init(mix.INIT_MP3)
+	if errSDLMixerInit != nil {
+		_, _ = fmt.Fprintf(os.Stderr, "Failed to initialise mixer: %s\n", errSDLMixerInit)
+		os.Exit(1)
+	}
+
+	if music, errLoadingMusic := mix.LoadMUS("./floppy.mp3"); errLoadingMusic != nil {
+		_, _ = fmt.Fprintf(os.Stderr, "Failed to load music from disk: %s\n", errLoadingMusic)
+		os.Exit(1)
+	} else {
+		_ = music.Play(1)
+	}
+}
+func backgroundFill(window *sdl.Window, surface *sdl.Surface) {
+	_ = surface.FillRect(nil, sdl.MapRGB(surface.Format, 255, 255, 255)) // Fill bg with white
+	_ = window.UpdateSurface()
+}
+func playMusic() {
+	errSDLAudioInit := sdl.Init(sdl.INIT_AUDIO)
+	if errSDLAudioInit != nil {
+		_, _ = fmt.Fprintf(os.Stderr, "Failed to initialise audio: %s\n", errSDLAudioInit)
+		os.Exit(1)
+	}
+
+	errOpeningAudioDevice := mix.OpenAudio(22050, mix.DEFAULT_FORMAT, 2, 4096)
+	if errOpeningAudioDevice != nil {
+		_, _ = fmt.Fprintf(os.Stderr, "Failed to open audio device: %s\n", errOpeningAudioDevice)
+		os.Exit(1)
+	}
+
+	errSDLMixerInit := mix.Init(mix.INIT_MP3)
+	if errSDLMixerInit != nil {
+		_, _ = fmt.Fprintf(os.Stderr, "Failed to initialise mixer: %s\n", errSDLMixerInit)
+		os.Exit(1)
+	}
+
+	if music, errLoadingMusic := mix.LoadMUS("despair4mat.mp3"); errLoadingMusic != nil {
+		_, _ = fmt.Fprintf(os.Stderr, "Failed to load music from disk: %s\n", errLoadingMusic)
+		os.Exit(1)
+	} else {
+		_ = music.Play(1)
+	}
+}
+func drawPixel(renderer *sdl.Renderer, xpos, ypos int32, R, G, B uint8) {
+	_ = renderer.SetDrawColor(R, G, B, 255)
+	_ = renderer.DrawPoint(xpos, ypos)
+	//renderer.Present()
+}
+func wipeToLeft(window *sdl.Window, surface *sdl.Surface) {
 	var i int32
 
 	//Mid to left full length screen wipe
@@ -138,14 +157,18 @@ func main() {
 		_ = window.UpdateSurface()
 		time.Sleep(time.Second / 360)
 	}
-
+}
+func wipeToRight(window *sdl.Window, surface *sdl.Surface) {
+	var i int32
 	//Mid to right full length screen wipe
 	for i = 1; i <= (windowWidth / 2); i++ {
 		_ = surface.FillRect(&sdl.Rect{X: ((windowWidth / 2) - 1) + i, W: i, H: windowHeight}, sdl.MapRGB(surface.Format, 0, 120, 128))
 		_ = window.UpdateSurface()
 		time.Sleep(time.Second / 360)
 	}
-
+}
+func horizontalBars(window *sdl.Window, surface *sdl.Surface) {
+	var i int32
 	// Horizontal bars
 	for i = 1; i < windowWidth; i++ {
 		//L2R
@@ -164,6 +187,9 @@ func main() {
 		time.Sleep(time.Second / 360)
 	}
 
+}
+func horizontalBars2(window *sdl.Window, surface *sdl.Surface) {
+	var i int32
 	//Horizontal bars 2
 	for i = 1; i < windowWidth; i++ {
 		//L2R
@@ -181,26 +207,15 @@ func main() {
 		_ = window.UpdateSurface()
 		time.Sleep(time.Second / 360)
 	}
-
+}
+func wipeTopDown(window *sdl.Window, surface *sdl.Surface) {
+	var i int32
 	//Clear top to bottom
 	for i = 1; i <= windowHeight; i++ {
 		_ = surface.FillRect(&sdl.Rect{W: windowWidth, H: 0 + i}, sdl.MapRGB(surface.Format, 0, 120, 128))
 		_ = window.UpdateSurface()
 	}
-
-	drawCircle(renderer, 100, 100, 80, 255, 255, 255)
-
-	time.Sleep(time.Second * 3)
-	_ = window.Destroy()
-	sdl.Quit()
 }
-
-func drawPixel(renderer *sdl.Renderer, xpos, ypos int32, R, G, B uint8) {
-	_ = renderer.SetDrawColor(R, G, B, 255)
-	_ = renderer.DrawPoint(xpos, ypos)
-	renderer.Present()
-}
-
 func drawCircle(renderer *sdl.Renderer, x0, y0, r int32, R, G, B uint8) {
 	var x, y, dx, dy int32 = r - 1, 0, 1, 1
 	var err = dx - (r * 2)
@@ -227,4 +242,5 @@ func drawCircle(renderer *sdl.Renderer, x0, y0, r int32, R, G, B uint8) {
 			err += dx - (r * 2)
 		}
 	}
+	renderer.Present()
 }
