@@ -36,6 +36,7 @@ func main() {
 	wipeToRight(window, surface, 0, 120, 128)
 	horizontalBars(window, surface, 0, 255, 90, 0, 255, 200)
 	horizontalBars2(window, surface, 0, 255, 90, 0, 120, 128)
+
 	wipeTopDown(window, surface, 0, 120, 128)
 	drawBubbles(renderer)
 	wipeToLeft(window, surface, 0, 120, 128)
@@ -138,13 +139,13 @@ func playMusic() {
 		os.Exit(1)
 	}
 
-	errSDLMixerInit := mix.Init(mix.INIT_MP3)
+	errSDLMixerInit := mix.Init(mix.INIT_MOD)
 	if errSDLMixerInit != nil {
 		_, _ = fmt.Fprintf(os.Stderr, "Failed to initialise mixer: %s\n", errSDLMixerInit)
 		os.Exit(1)
 	}
 
-	if music, errLoadingMusic := mix.LoadMUS("despair4mat.mp3"); errLoadingMusic != nil {
+	if music, errLoadingMusic := mix.LoadMUS("echoing.mod"); errLoadingMusic != nil {
 		_, _ = fmt.Fprintf(os.Stderr, "Failed to load music from disk: %s\n", errLoadingMusic)
 		os.Exit(1)
 	} else {
@@ -254,6 +255,7 @@ func drawCircle(renderer *sdl.Renderer, x0, y0, r int32, R, G, B uint8) {
 }
 func drawBubbles(renderer *sdl.Renderer) {
 	for i := 0; i <= 300; i++ {
+		time.Sleep(time.Second / 270)
 		drawCircle(renderer, int32(rand.Intn(800)), int32(rand.Intn(600)), int32(rand.Intn(80)), uint8(rand.Intn(255)), uint8(rand.Intn(255)), uint8(rand.Intn(255)))
 	}
 }
