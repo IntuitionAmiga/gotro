@@ -33,7 +33,6 @@ func main() {
 
 	wipeToLeft(window, surface)
 	wipeToRight(window, surface)
-
 	horizontalBars(window, surface)
 	horizontalBars2(window, surface)
 
