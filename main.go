@@ -43,7 +43,6 @@ func main() {
 	_ = window.Destroy()
 	sdl.Quit()
 }
-
 func createWindow() *sdl.Window {
 	window, errCreatingSDLWindow := sdl.CreateWindow("Gotro by Intuition",
 		sdl.WINDOWPOS_UNDEFINED,
