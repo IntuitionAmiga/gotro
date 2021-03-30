@@ -45,8 +45,8 @@ func main() {
 }
 func createWindow() *sdl.Window {
 	window, errCreatingSDLWindow := sdl.CreateWindow("Gotro by Intuition",
-		sdl.WINDOWPOS_UNDEFINED,
-		sdl.WINDOWPOS_UNDEFINED,
+		sdl.WINDOWPOS_CENTERED,
+		sdl.WINDOWPOS_CENTERED,
 		windowWidth,
 		windowHeight,
 		sdl.WINDOW_SHOWN)
