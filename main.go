@@ -15,10 +15,38 @@ const windowWidth, windowHeight = 800, 600
 func main() {
 	//Setup video and audio
 	sdlInitVideo()
+	var window = createWindow()
+	var renderer = createRenderer(window)
+	var surface = createSurface(window)
 
+	var _ = sdl.PollEvent() //MacOS won't draw the window without this line
+
+	//Start intro
+	_ = showKickstart(renderer)
+	playFloppySounds()
+	time.Sleep(time.Second * 2)
+
+	backgroundFill(window, surface, 255, 255, 255) //Fill bg with white
+	time.Sleep(time.Second * 9)
+
+	playMusic()
+
+	wipeToLeft(window, surface)
+	wipeToRight(window, surface)
+	horizontalBars(window, surface)
+	horizontalBars2(window, surface)
+
+	wipeTopDown(window, surface)
+	drawCircle(renderer, 200, 200, 80, 255, 255, 255)
+	time.Sleep(time.Second * 3)
+
+	_ = window.Destroy()
+	sdl.Quit()
+}
+func createWindow() *sdl.Window {
 	window, errCreatingSDLWindow := sdl.CreateWindow("Gotro by Intuition",
-		sdl.WINDOWPOS_UNDEFINED,
-		sdl.WINDOWPOS_UNDEFINED,
+		sdl.WINDOWPOS_CENTERED,
+		sdl.WINDOWPOS_CENTERED,
 		windowWidth,
 		windowHeight,
 		sdl.WINDOW_SHOWN)
@@ -27,45 +55,23 @@ func main() {
 		_, _ = fmt.Fprintf(os.Stderr, "Failed to create SDL window: %s\n", errCreatingSDLWindow)
 		os.Exit(1)
 	}
-
+	return window
+}
+func createRenderer(window *sdl.Window) *sdl.Renderer {
 	renderer, errCreatingSDLRenderer := sdl.CreateRenderer(window, -1, sdl.RENDERER_SOFTWARE)
 	if errCreatingSDLRenderer != nil {
 		_, _ = fmt.Fprintf(os.Stderr, "Failed to create renderer: %s\n", errCreatingSDLRenderer)
 		os.Exit(1)
 	}
-
+	return renderer
+}
+func createSurface(window *sdl.Window) *sdl.Surface {
 	surface, errCreatingSDLSurface := window.GetSurface()
 	if errCreatingSDLSurface != nil {
 		_, _ = fmt.Fprint(os.Stderr, "Failed to create window surface: \n", errCreatingSDLSurface)
 		os.Exit(1)
 	}
-
-	//MacOS won't draw the window without this line
-	var _ = sdl.PollEvent()
-
-	//Start intro
-	_ = showKickstart(renderer)
-
-	playFloppySounds()
-	time.Sleep(time.Second * 2)
-
-	backgroundFill(window, surface)
-	time.Sleep(time.Second * 9)
-
-	playMusic()
-
-	wipeToLeft(window, surface)
-	wipeToRight(window, surface)
-
-	horizontalBars(window, surface)
-	horizontalBars2(window, surface)
-
-	wipeTopDown(window, surface)
-	drawCircle(renderer, 100, 100, 80, 255, 255, 255)
-	time.Sleep(time.Second * 3)
-
-	_ = window.Destroy()
-	sdl.Quit()
+	return surface
 }
 func sdlInitVideo() {
 	err := sdl.Init(sdl.INIT_VIDEO)
@@ -113,8 +119,8 @@ func playFloppySounds() {
 		_ = music.Play(1)
 	}
 }
-func backgroundFill(window *sdl.Window, surface *sdl.Surface) {
-	_ = surface.FillRect(nil, sdl.MapRGB(surface.Format, 255, 255, 255)) // Fill bg with white
+func backgroundFill(window *sdl.Window, surface *sdl.Surface, R, G, B uint8) {
+	_ = surface.FillRect(nil, sdl.MapRGB(surface.Format, R, G, B))
 	_ = window.UpdateSurface()
 }
 func playMusic() {
