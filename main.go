@@ -41,7 +41,9 @@ func main() {
 	drawBubbles(renderer)
 	wipeToLeft(window, surface, 0, 120, 128)
 	wipeToRight(window, surface, 0, 120, 128)
+
 	wipeTopDown(window, surface, 255, 255, 255)
+	boingBall(renderer, 255, 255, 255)
 
 	_ = window.Destroy()
 	sdl.Quit()
@@ -257,5 +259,36 @@ func drawBubbles(renderer *sdl.Renderer) {
 	for i := 0; i <= 300; i++ {
 		time.Sleep(time.Second / 270)
 		drawCircle(renderer, int32(rand.Intn(800)), int32(rand.Intn(600)), int32(rand.Intn(80)), uint8(rand.Intn(255)), uint8(rand.Intn(255)), uint8(rand.Intn(255)))
+	}
+}
+func drawSprite(renderer *sdl.Renderer, x, y int32, R, G, B uint8) {
+	src := sdl.Rect{W: 455, H: 456}
+	dst := sdl.Rect{X: x, Y: y, W: 128, H: 128}
+	sprite, _ := img.Load("boingball.png")
+	texture, _ := renderer.CreateTextureFromSurface(sprite)
+	_ = renderer.SetDrawColor(R, G, B, 255)
+	_ = renderer.Clear()
+	_ = renderer.Copy(texture, &src, &dst)
+	renderer.Present()
+}
+func boingBall(renderer *sdl.Renderer, R, G, B uint8) {
+	var xPos, yPos int
+	for i := 0; i <= (windowHeight - 128); i++ {
+		drawSprite(renderer, int32(i), int32(i), R, G, B)
+		xPos = i
+		yPos = i
+		fmt.Println("X:", i, "Y:", yPos)
+	}
+	for i := xPos; i <= (windowWidth - 128); i++ {
+		drawSprite(renderer, int32(i), int32(yPos+10), R, G, B)
+		yPos -= 1
+		xPos = i
+		fmt.Println("X:", i, "Y:", yPos)
+	}
+	for i := yPos; i >= 0; i-- {
+		drawSprite(renderer, int32(xPos+i), int32(i), R, G, B)
+		xPos = i
+		yPos -= 1
+		fmt.Println("X:", i, "Y:", yPos)
 	}
 }
