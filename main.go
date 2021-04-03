@@ -11,7 +11,7 @@ import (
 	"github.com/veandco/go-sdl2/sdl"
 )
 
-const windowWidth, windowHeight = 800, 600
+const windowWidth, windowHeight, centreX, centreY = 800, 600, windowWidth / 2, windowHeight / 2
 
 func main() {
 	//Setup video and audio
@@ -19,7 +19,6 @@ func main() {
 	var window = createWindow()
 	var renderer = createRenderer(window)
 	var surface = createSurface(window)
-
 	var _ = sdl.PollEvent() //MacOS won't draw the window without this line
 
 	//Start intro
@@ -44,6 +43,9 @@ func main() {
 
 	wipeTopDown(window, surface, 255, 255, 255)
 	boingBall(renderer, 255, 255, 255)
+
+	//	wipeTopDown(window, surface, 0, 0, 0)
+	copperBars(renderer, window, surface)
 
 	_ = window.Destroy()
 	sdl.Quit()
@@ -157,7 +159,6 @@ func playMusic() {
 func drawPixel(renderer *sdl.Renderer, xpos, ypos int32, R, G, B uint8) {
 	_ = renderer.SetDrawColor(R, G, B, 255)
 	_ = renderer.DrawPoint(xpos, ypos)
-	//renderer.Present()
 }
 func wipeToLeft(window *sdl.Window, surface *sdl.Surface, R, G, B uint8) {
 	var i int32
@@ -277,18 +278,112 @@ func boingBall(renderer *sdl.Renderer, R, G, B uint8) {
 		drawSprite(renderer, int32(i), int32(i), R, G, B)
 		xPos = i
 		yPos = i
-		fmt.Println("X:", i, "Y:", yPos)
+		//fmt.Println("X:", i, "Y:", yPos)
 	}
 	for i := xPos; i <= (windowWidth - 128); i++ {
 		drawSprite(renderer, int32(i), int32(yPos+10), R, G, B)
 		yPos -= 1
 		xPos = i
-		fmt.Println("X:", i, "Y:", yPos)
+		//fmt.Println("X:", i, "Y:", yPos)
 	}
 	for i := yPos; i >= 0; i-- {
 		drawSprite(renderer, int32(xPos+i), int32(i), R, G, B)
 		xPos = i
 		yPos -= 1
-		fmt.Println("X:", i, "Y:", yPos)
+		//fmt.Println("X:", i, "Y:", yPos)
 	}
+}
+func copperBars(renderer *sdl.Renderer, window *sdl.Window, surface *sdl.Surface) {
+	var startX, startY int32 = windowWidth, windowHeight / 2
+	var redY int32 = 0
+	var greenY = int32(windowHeight / 3)
+	var blueY = int32((windowHeight / 3) * 2)
+
+	_ = renderer.SetDrawColor(0, 0, 0, 0)
+
+	redBar := func() {
+		for i := int32(0); i <= 35; i++ {
+			//Red
+			redY += i
+			_ = renderer.Clear()
+			//renderer.Present()
+			_ = surface.FillRect(&sdl.Rect{X: startX - windowWidth, Y: redY + 24, W: windowWidth, H: 4}, sdl.MapRGB(surface.Format, 8, 0, 0))
+			_ = surface.FillRect(&sdl.Rect{X: startX - windowWidth, Y: redY + 20, W: windowWidth, H: 4}, sdl.MapRGB(surface.Format, 16, 0, 0))
+			_ = surface.FillRect(&sdl.Rect{X: startX - windowWidth, Y: redY + 16, W: windowWidth, H: 4}, sdl.MapRGB(surface.Format, 32, 0, 0))
+			_ = surface.FillRect(&sdl.Rect{X: startX - windowWidth, Y: redY + 12, W: windowWidth, H: 4}, sdl.MapRGB(surface.Format, 63, 0, 0))
+			_ = surface.FillRect(&sdl.Rect{X: startX - windowWidth, Y: redY + 8, W: windowWidth, H: 4}, sdl.MapRGB(surface.Format, 127, 0, 0))
+			_ = surface.FillRect(&sdl.Rect{X: startX - windowWidth, Y: redY + 4, W: windowWidth, H: 4}, sdl.MapRGB(surface.Format, 191, 0, 0))
+			_ = surface.FillRect(&sdl.Rect{X: startX - windowWidth, Y: redY, W: windowWidth, H: 4}, sdl.MapRGB(surface.Format, 255, 0, 0))
+			_ = surface.FillRect(&sdl.Rect{X: startX - windowWidth, Y: redY - 4, W: windowWidth, H: 4}, sdl.MapRGB(surface.Format, 191, 0, 0))
+			_ = surface.FillRect(&sdl.Rect{X: startX - windowWidth, Y: redY - 8, W: windowWidth, H: 4}, sdl.MapRGB(surface.Format, 127, 0, 0))
+			_ = surface.FillRect(&sdl.Rect{X: startX - windowWidth, Y: redY - 12, W: windowWidth, H: 4}, sdl.MapRGB(surface.Format, 63, 0, 0))
+			_ = surface.FillRect(&sdl.Rect{X: startX - windowWidth, Y: redY - 16, W: windowWidth, H: 4}, sdl.MapRGB(surface.Format, 32, 0, 0))
+			_ = surface.FillRect(&sdl.Rect{X: startX - windowWidth, Y: redY - 20, W: windowWidth, H: 4}, sdl.MapRGB(surface.Format, 16, 0, 0))
+			_ = surface.FillRect(&sdl.Rect{X: startX - windowWidth, Y: redY - 24, W: windowWidth, H: 4}, sdl.MapRGB(surface.Format, 8, 0, 0))
+			_ = window.UpdateSurface()
+			time.Sleep(time.Second / 8)
+		}
+	}
+	greenBar := func() {
+		for i := int32(0); i <= 35; i++ {
+			//Green
+			greenY += i
+			_ = renderer.Clear()
+			//		renderer.Present()
+			_ = surface.FillRect(&sdl.Rect{X: startX - windowWidth, Y: greenY + 24, W: windowWidth, H: 4}, sdl.MapRGB(surface.Format, 0, 8, 0))
+			_ = surface.FillRect(&sdl.Rect{X: startX - windowWidth, Y: greenY + 20, W: windowWidth, H: 4}, sdl.MapRGB(surface.Format, 0, 16, 0))
+			_ = surface.FillRect(&sdl.Rect{X: startX - windowWidth, Y: greenY + 16, W: windowWidth, H: 4}, sdl.MapRGB(surface.Format, 0, 32, 0))
+			_ = surface.FillRect(&sdl.Rect{X: startX - windowWidth, Y: greenY + 12, W: windowWidth, H: 4}, sdl.MapRGB(surface.Format, 0, 63, 0))
+			_ = surface.FillRect(&sdl.Rect{X: startX - windowWidth, Y: greenY + 8, W: windowWidth, H: 4}, sdl.MapRGB(surface.Format, 0, 127, 0))
+			_ = surface.FillRect(&sdl.Rect{X: startX - windowWidth, Y: greenY + 4, W: windowWidth, H: 4}, sdl.MapRGB(surface.Format, 0, 191, 0))
+			_ = surface.FillRect(&sdl.Rect{X: startX - windowWidth, Y: greenY, W: windowWidth, H: 4}, sdl.MapRGB(surface.Format, 0, 255, 0))
+			_ = surface.FillRect(&sdl.Rect{X: startX - windowWidth, Y: greenY - 4, W: windowWidth, H: 4}, sdl.MapRGB(surface.Format, 0, 191, 0))
+			_ = surface.FillRect(&sdl.Rect{X: startX - windowWidth, Y: greenY - 8, W: windowWidth, H: 4}, sdl.MapRGB(surface.Format, 0, 127, 0))
+			_ = surface.FillRect(&sdl.Rect{X: startX - windowWidth, Y: greenY - 12, W: windowWidth, H: 4}, sdl.MapRGB(surface.Format, 0, 63, 0))
+			_ = surface.FillRect(&sdl.Rect{X: startX - windowWidth, Y: greenY - 16, W: windowWidth, H: 4}, sdl.MapRGB(surface.Format, 0, 32, 0))
+			_ = surface.FillRect(&sdl.Rect{X: startX - windowWidth, Y: greenY - 20, W: windowWidth, H: 4}, sdl.MapRGB(surface.Format, 0, 16, 0))
+			_ = surface.FillRect(&sdl.Rect{X: startX - windowWidth, Y: greenY - 24, W: windowWidth, H: 4}, sdl.MapRGB(surface.Format, 0, 8, 0))
+			_ = window.UpdateSurface()
+			time.Sleep(time.Second / 10)
+		}
+	}
+	blueBar := func() {
+		for i := int32(0); i <= 35; i++ {
+			//Blue
+			blueY += i
+			_ = renderer.Clear()
+			//		renderer.Present()
+			_ = surface.FillRect(&sdl.Rect{X: startX - windowWidth, Y: blueY + 24, W: windowWidth, H: 4}, sdl.MapRGB(surface.Format, 0, 0, 8))
+			_ = surface.FillRect(&sdl.Rect{X: startX - windowWidth, Y: blueY + 20, W: windowWidth, H: 4}, sdl.MapRGB(surface.Format, 0, 0, 16))
+			_ = surface.FillRect(&sdl.Rect{X: startX - windowWidth, Y: blueY + 16, W: windowWidth, H: 4}, sdl.MapRGB(surface.Format, 0, 0, 32))
+			_ = surface.FillRect(&sdl.Rect{X: startX - windowWidth, Y: blueY + 12, W: windowWidth, H: 4}, sdl.MapRGB(surface.Format, 0, 0, 63))
+			_ = surface.FillRect(&sdl.Rect{X: startX - windowWidth, Y: blueY + 8, W: windowWidth, H: 4}, sdl.MapRGB(surface.Format, 0, 0, 127))
+			_ = surface.FillRect(&sdl.Rect{X: startX - windowWidth, Y: blueY + 4, W: windowWidth, H: 4}, sdl.MapRGB(surface.Format, 0, 0, 191))
+			_ = surface.FillRect(&sdl.Rect{X: startX - windowWidth, Y: blueY, W: windowWidth, H: 4}, sdl.MapRGB(surface.Format, 0, 0, 255))
+			_ = surface.FillRect(&sdl.Rect{X: startX - windowWidth, Y: blueY - 4, W: windowWidth, H: 4}, sdl.MapRGB(surface.Format, 0, 0, 191))
+			_ = surface.FillRect(&sdl.Rect{X: startX - windowWidth, Y: blueY - 8, W: windowWidth, H: 4}, sdl.MapRGB(surface.Format, 0, 0, 127))
+			_ = surface.FillRect(&sdl.Rect{X: startX - windowWidth, Y: blueY - 12, W: windowWidth, H: 4}, sdl.MapRGB(surface.Format, 0, 0, 63))
+			_ = surface.FillRect(&sdl.Rect{X: startX - windowWidth, Y: blueY - 16, W: windowWidth, H: 4}, sdl.MapRGB(surface.Format, 0, 0, 32))
+			_ = surface.FillRect(&sdl.Rect{X: startX - windowWidth, Y: blueY - 20, W: windowWidth, H: 4}, sdl.MapRGB(surface.Format, 0, 0, 16))
+			_ = surface.FillRect(&sdl.Rect{X: startX - windowWidth, Y: blueY - 24, W: windowWidth, H: 4}, sdl.MapRGB(surface.Format, 0, 0, 8))
+			_ = window.UpdateSurface()
+			time.Sleep(time.Second / 12)
+		}
+	}
+
+	redBar()
+	greenBar()
+	blueBar()
+
+	for i := 0; i < windowWidth*2; i++ {
+		_ = surface.FillRect(&sdl.Rect{X: startX - int32(i), Y: startY - 48, W: 1, H: 16}, sdl.MapRGB(surface.Format, 255, 0, 0))
+		_ = surface.FillRect(&sdl.Rect{X: startX - int32(i), Y: startY - 32, W: 1, H: 16}, sdl.MapRGB(surface.Format, 255, 127, 0))
+		_ = surface.FillRect(&sdl.Rect{X: startX - int32(i), Y: startY - 16, W: 1, H: 16}, sdl.MapRGB(surface.Format, 255, 255, 0))
+		_ = surface.FillRect(&sdl.Rect{X: startX - int32(i), Y: startY, W: 1, H: 16}, sdl.MapRGB(surface.Format, 0, 255, 0))
+		_ = surface.FillRect(&sdl.Rect{X: startX - int32(i), Y: startY + 16, W: 1, H: 16}, sdl.MapRGB(surface.Format, 0, 0, 255))
+		_ = surface.FillRect(&sdl.Rect{X: startX - int32(i), Y: startY + 32, W: 1, H: 16}, sdl.MapRGB(surface.Format, 46, 43, 95))
+		_ = surface.FillRect(&sdl.Rect{X: startX - int32(i), Y: startY + 48, W: 1, H: 16}, sdl.MapRGB(surface.Format, 139, 0, 255))
+		_ = window.UpdateSurface()
+	}
+	//sdl.Delay(5000)
 }
