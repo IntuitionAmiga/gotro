@@ -11,7 +11,7 @@ import (
 	"github.com/veandco/go-sdl2/sdl"
 )
 
-const windowWidth, windowHeight, centreX, centreY = 800, 600, windowWidth / 2, windowHeight / 2
+const windowWidth, windowHeight, fontHeight, fontWidth = 800, 600, 32, 32
 
 func main() {
 	//Setup video and audio
@@ -31,6 +31,8 @@ func main() {
 
 	playMusic()
 
+	boingBall(renderer, 255, 0, 255)
+
 	wipeToLeft(window, surface, 0, 120, 128)
 	wipeToRight(window, surface, 0, 120, 128)
 	horizontalBars(window, surface, 0, 255, 90, 0, 255, 200)
@@ -41,14 +43,22 @@ func main() {
 	wipeToLeft(window, surface, 0, 120, 128)
 	wipeToRight(window, surface, 0, 120, 128)
 
-	wipeTopDown(window, surface, 255, 255, 255)
-	boingBall(renderer, 255, 255, 255)
+	//wipeTopDown(window, surface, 255, 255, 255)
+	//boingBall(renderer, 255, 255, 255)
 
 	//	wipeTopDown(window, surface, 0, 0, 0)
 	copperBars(renderer, window, surface)
 
 	_ = window.Destroy()
-	sdl.Quit()
+
+}
+func sdlInitVideo() {
+	err := sdl.Init(sdl.INIT_VIDEO)
+	if err != nil {
+		_, _ = fmt.Fprintf(os.Stderr, "Failed to initialise video: %s\n", err)
+		os.Exit(1)
+	}
+	defer sdl.Quit()
 }
 func createWindow() *sdl.Window {
 	window, errCreatingSDLWindow := sdl.CreateWindow("Gotro by Intuition",
@@ -79,13 +89,6 @@ func createSurface(window *sdl.Window) *sdl.Surface {
 		os.Exit(1)
 	}
 	return surface
-}
-func sdlInitVideo() {
-	err := sdl.Init(sdl.INIT_VIDEO)
-	if err != nil {
-		_, _ = fmt.Fprintf(os.Stderr, "Failed to initialise video: %s\n", err)
-		os.Exit(1)
-	}
 }
 func showKickstart(kickRenderer *sdl.Renderer) error {
 	_ = kickRenderer.Clear()
@@ -294,7 +297,7 @@ func boingBall(renderer *sdl.Renderer, R, G, B uint8) {
 	}
 }
 func copperBars(renderer *sdl.Renderer, window *sdl.Window, surface *sdl.Surface) {
-	var startX, startY int32 = windowWidth, windowHeight / 2
+	var startX, startY int32 = windowWidth, windowHeight/2 + 16
 	var redY int32 = 0
 	var greenY = int32(windowHeight / 3)
 	var blueY = int32((windowHeight / 3) * 2)
