@@ -11,43 +11,52 @@ import (
 	"github.com/veandco/go-sdl2/sdl"
 )
 
-const windowWidth, windowHeight, fontHeight, fontWidth = 800, 600, 32, 32
+const windowWidth, windowHeight = 800, 600
+
+var window *sdl.Window
+var renderer *sdl.Renderer
+var surface *sdl.Surface
 
 func main() {
-	//Setup video and audio
 	sdlInitVideo()
-	var window = createWindow()
-	var renderer = createRenderer(window)
-	var surface = createSurface(window)
+	window = createWindow()
+	renderer = createRenderer()
+	surface = createSurface()
 	var _ = sdl.PollEvent() //MacOS won't draw the window without this line
 
 	//Start intro
-	_ = showKickstart(renderer)
+	_ = showKickstart()
 	playFloppySounds()
 	time.Sleep(time.Second * 2)
 
-	backgroundFill(window, surface, 255, 255, 255) //Fill bg with white
+	backgroundFill(255, 255, 255) //Fill bg with white
 	time.Sleep(time.Second * 9)
 
 	playMusic()
 
-	boingBall(renderer, 255, 0, 255)
+	wipeToLeft(255, 0, 90)
+	wipeToRight(0, 120, 128)
+	wipeToLeft(0, 120, 128)
+	wipeToRight(255, 0, 90)
+	wipeToLeft(255, 0, 90)
 
-	wipeToLeft(window, surface, 0, 120, 128)
-	wipeToRight(window, surface, 0, 120, 128)
-	horizontalBars(window, surface, 0, 255, 90, 0, 255, 200)
-	horizontalBars2(window, surface, 0, 255, 90, 0, 120, 128)
+	boingBall(255, 0, 90)
+	copperBars()
 
-	wipeTopDown(window, surface, 0, 120, 128)
-	drawBubbles(renderer)
-	wipeToLeft(window, surface, 0, 120, 128)
-	wipeToRight(window, surface, 0, 120, 128)
+	wipeTopDown(0, 0, 0)
+	drawBubbles()
 
-	//wipeTopDown(window, surface, 255, 255, 255)
-	//boingBall(renderer, 255, 255, 255)
+	wipeToLeft(0, 120, 128)
+	wipeToRight(0, 120, 128)
 
-	//	wipeTopDown(window, surface, 0, 0, 0)
-	copperBars(renderer, window, surface)
+	//horizontalBars(window, surface, 0, 255, 90, 0, 255, 200)
+	//horizontalBars2(window, surface, 0, 255, 90, 0, 120, 128)
+	horizontalBars(255, 0, 90, 0, 255, 200)
+	horizontalBars2(0, 120, 128, 255, 0, 128)
+
+	//wipeTopDown(window, surface, 0, 120, 128)
+	wipeToLeft(0, 0, 0)
+	wipeToRight(0, 0, 0)
 
 	_ = window.Destroy()
 
@@ -58,6 +67,7 @@ func sdlInitVideo() {
 		_, _ = fmt.Fprintf(os.Stderr, "Failed to initialise video: %s\n", err)
 		os.Exit(1)
 	}
+
 	defer sdl.Quit()
 }
 func createWindow() *sdl.Window {
@@ -74,7 +84,7 @@ func createWindow() *sdl.Window {
 	}
 	return window
 }
-func createRenderer(window *sdl.Window) *sdl.Renderer {
+func createRenderer() *sdl.Renderer {
 	renderer, errCreatingSDLRenderer := sdl.CreateRenderer(window, -1, sdl.RENDERER_SOFTWARE)
 	if errCreatingSDLRenderer != nil {
 		_, _ = fmt.Fprintf(os.Stderr, "Failed to create renderer: %s\n", errCreatingSDLRenderer)
@@ -82,7 +92,7 @@ func createRenderer(window *sdl.Window) *sdl.Renderer {
 	}
 	return renderer
 }
-func createSurface(window *sdl.Window) *sdl.Surface {
+func createSurface() *sdl.Surface {
 	surface, errCreatingSDLSurface := window.GetSurface()
 	if errCreatingSDLSurface != nil {
 		_, _ = fmt.Fprint(os.Stderr, "Failed to create window surface: \n", errCreatingSDLSurface)
@@ -90,17 +100,15 @@ func createSurface(window *sdl.Window) *sdl.Surface {
 	}
 	return surface
 }
-func showKickstart(kickRenderer *sdl.Renderer) error {
-	_ = kickRenderer.Clear()
-
-	t, err := img.LoadTexture(kickRenderer, "kick13.png")
+func showKickstart() error {
+	t, err := img.LoadTexture(renderer, "kick13.png")
 	if err != nil {
 		return fmt.Errorf("couldn't load image from disk")
 	}
-	if err := kickRenderer.Copy(t, nil, nil); err != nil {
+	if err := renderer.Copy(t, nil, nil); err != nil {
 		return fmt.Errorf("couldn't copy texture: %v", err)
 	}
-	kickRenderer.Present()
+	renderer.Present()
 	return err
 }
 func playFloppySounds() {
@@ -129,7 +137,7 @@ func playFloppySounds() {
 		_ = music.Play(1)
 	}
 }
-func backgroundFill(window *sdl.Window, surface *sdl.Surface, R, G, B uint8) {
+func backgroundFill(R, G, B uint8) {
 	_ = surface.FillRect(nil, sdl.MapRGB(surface.Format, R, G, B))
 	_ = window.UpdateSurface()
 }
@@ -159,30 +167,30 @@ func playMusic() {
 		_ = music.Play(1)
 	}
 }
-func drawPixel(renderer *sdl.Renderer, xpos, ypos int32, R, G, B uint8) {
+func drawPixel(xpos, ypos int32, R, G, B uint8) {
 	_ = renderer.SetDrawColor(R, G, B, 255)
 	_ = renderer.DrawPoint(xpos, ypos)
 }
-func wipeToLeft(window *sdl.Window, surface *sdl.Surface, R, G, B uint8) {
+func wipeToLeft(R, G, B uint8) {
 	var i int32
 
 	//Mid to left full length screen wipe
 	for i = 1; i <= (windowWidth / 2); i++ {
-		time.Sleep(time.Second / 180)
+		//time.Sleep(time.Second / 270)
 		_ = surface.FillRect(&sdl.Rect{X: (windowWidth / 2) - i, W: i, H: windowHeight}, sdl.MapRGB(surface.Format, R, G, B))
 		_ = window.UpdateSurface()
 	}
 }
-func wipeToRight(window *sdl.Window, surface *sdl.Surface, R, G, B uint8) {
+func wipeToRight(R, G, B uint8) {
 	var i int32
 	//Mid to right full length screen wipe
 	for i = 1; i <= (windowWidth / 2); i++ {
-		time.Sleep(time.Second / 180)
+		//time.Sleep(time.Second / 270)
 		_ = surface.FillRect(&sdl.Rect{X: ((windowWidth / 2) - 1) + i, W: i, H: windowHeight}, sdl.MapRGB(surface.Format, R, G, B))
 		_ = window.UpdateSurface()
 	}
 }
-func horizontalBars(window *sdl.Window, surface *sdl.Surface, R1, G1, B1, R2, G2, B2 uint8) {
+func horizontalBars(R1, G1, B1, R2, G2, B2 uint8) {
 	var i int32
 	// Horizontal bars
 	for i = 1; i < windowWidth; i++ {
@@ -203,7 +211,7 @@ func horizontalBars(window *sdl.Window, surface *sdl.Surface, R1, G1, B1, R2, G2
 	}
 
 }
-func horizontalBars2(window *sdl.Window, surface *sdl.Surface, R1, G1, B1, R2, G2, B2 uint8) {
+func horizontalBars2(R1, G1, B1, R2, G2, B2 uint8) {
 	var i int32
 	//Horizontal bars 2
 	for i = 1; i < windowWidth; i++ {
@@ -223,7 +231,7 @@ func horizontalBars2(window *sdl.Window, surface *sdl.Surface, R1, G1, B1, R2, G
 		_ = window.UpdateSurface()
 	}
 }
-func wipeTopDown(window *sdl.Window, surface *sdl.Surface, R, G, B uint8) {
+func wipeTopDown(R, G, B uint8) {
 	var i int32
 	//Clear top to bottom
 	for i = 1; i <= windowHeight; i++ {
@@ -231,19 +239,19 @@ func wipeTopDown(window *sdl.Window, surface *sdl.Surface, R, G, B uint8) {
 		_ = window.UpdateSurface()
 	}
 }
-func drawCircle(renderer *sdl.Renderer, x0, y0, r int32, R, G, B uint8) {
+func drawCircle(x0, y0, r int32, R, G, B uint8) {
 	var x, y, dx, dy int32 = r - 1, 0, 1, 1
 	var err = dx - (r * 2)
 
 	for x > y {
-		drawPixel(renderer, x0+x, y0+y, R, G, B)
-		drawPixel(renderer, x0+y, y0+x, R, G, B)
-		drawPixel(renderer, x0-y, y0+x, R, G, B)
-		drawPixel(renderer, x0-x, y0+y, R, G, B)
-		drawPixel(renderer, x0-x, y0-y, R, G, B)
-		drawPixel(renderer, x0-y, y0-x, R, G, B)
-		drawPixel(renderer, x0+y, y0-x, R, G, B)
-		drawPixel(renderer, x0+x, y0-y, R, G, B)
+		drawPixel(x0+x, y0+y, R, G, B)
+		drawPixel(x0+y, y0+x, R, G, B)
+		drawPixel(x0-y, y0+x, R, G, B)
+		drawPixel(x0-x, y0+y, R, G, B)
+		drawPixel(x0-x, y0-y, R, G, B)
+		drawPixel(x0-y, y0-x, R, G, B)
+		drawPixel(x0+y, y0-x, R, G, B)
+		drawPixel(x0+x, y0-y, R, G, B)
 
 		if err <= 0 {
 			y++
@@ -259,13 +267,14 @@ func drawCircle(renderer *sdl.Renderer, x0, y0, r int32, R, G, B uint8) {
 	}
 	renderer.Present()
 }
-func drawBubbles(renderer *sdl.Renderer) {
+func drawBubbles() {
 	for i := 0; i <= 300; i++ {
-		time.Sleep(time.Second / 270)
-		drawCircle(renderer, int32(rand.Intn(800)), int32(rand.Intn(600)), int32(rand.Intn(80)), uint8(rand.Intn(255)), uint8(rand.Intn(255)), uint8(rand.Intn(255)))
+		time.Sleep(time.Second / 180)
+		drawCircle(int32(rand.Intn(800)), int32(rand.Intn(600)), int32(rand.Intn(80)), uint8(rand.Intn(255)), uint8(rand.Intn(255)), uint8(rand.Intn(255)))
 	}
+	time.Sleep(time.Second)
 }
-func drawSprite(renderer *sdl.Renderer, x, y int32, R, G, B uint8) {
+func drawSprite(x, y int32, R, G, B uint8) {
 	src := sdl.Rect{W: 455, H: 456}
 	dst := sdl.Rect{X: x, Y: y, W: 128, H: 128}
 	sprite, _ := img.Load("boingball.png")
@@ -275,28 +284,28 @@ func drawSprite(renderer *sdl.Renderer, x, y int32, R, G, B uint8) {
 	_ = renderer.Copy(texture, &src, &dst)
 	renderer.Present()
 }
-func boingBall(renderer *sdl.Renderer, R, G, B uint8) {
+func boingBall(R, G, B uint8) {
 	var xPos, yPos int
 	for i := 0; i <= (windowHeight - 128); i++ {
-		drawSprite(renderer, int32(i), int32(i), R, G, B)
+		drawSprite(int32(i), int32(i), R, G, B)
 		xPos = i
 		yPos = i
 		//fmt.Println("X:", i, "Y:", yPos)
 	}
 	for i := xPos; i <= (windowWidth - 128); i++ {
-		drawSprite(renderer, int32(i), int32(yPos+10), R, G, B)
+		drawSprite(int32(i), int32(yPos+10), R, G, B)
 		yPos -= 1
 		xPos = i
 		//fmt.Println("X:", i, "Y:", yPos)
 	}
 	for i := yPos; i >= 0; i-- {
-		drawSprite(renderer, int32(xPos+i), int32(i), R, G, B)
+		drawSprite(int32(xPos+i), int32(i), R, G, B)
 		xPos = i
 		yPos -= 1
 		//fmt.Println("X:", i, "Y:", yPos)
 	}
 }
-func copperBars(renderer *sdl.Renderer, window *sdl.Window, surface *sdl.Surface) {
+func copperBars() {
 	var startX, startY int32 = windowWidth, windowHeight/2 + 16
 	var redY int32 = 0
 	var greenY = int32(windowHeight / 3)
@@ -378,7 +387,7 @@ func copperBars(renderer *sdl.Renderer, window *sdl.Window, surface *sdl.Surface
 	greenBar()
 	blueBar()
 
-	for i := 0; i < windowWidth*2; i++ {
+	for i := 0; i < windowWidth+windowWidth/2; i++ {
 		_ = surface.FillRect(&sdl.Rect{X: startX - int32(i), Y: startY - 48, W: 1, H: 16}, sdl.MapRGB(surface.Format, 255, 0, 0))
 		_ = surface.FillRect(&sdl.Rect{X: startX - int32(i), Y: startY - 32, W: 1, H: 16}, sdl.MapRGB(surface.Format, 255, 127, 0))
 		_ = surface.FillRect(&sdl.Rect{X: startX - int32(i), Y: startY - 16, W: 1, H: 16}, sdl.MapRGB(surface.Format, 255, 255, 0))
@@ -388,5 +397,4 @@ func copperBars(renderer *sdl.Renderer, window *sdl.Window, surface *sdl.Surface
 		_ = surface.FillRect(&sdl.Rect{X: startX - int32(i), Y: startY + 48, W: 1, H: 16}, sdl.MapRGB(surface.Format, 139, 0, 255))
 		_ = window.UpdateSurface()
 	}
-	//sdl.Delay(5000)
 }
