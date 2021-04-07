@@ -419,6 +419,11 @@ func updateScreen(surfaceOrRenderer string) {
 
 	for lastTime-sdl.GetTicks() < ticksForNextFrame {
 		sdl.Delay(1)
+		lastTime = sdl.GetTicks()
+		fmt.Println(surfaceOrRenderer)
+		fmt.Println("Last time: ", lastTime)
+		fmt.Println("GetTicks:", sdl.GetTicks())
+		fmt.Println("ticksForNextFrame", ticksForNextFrame)
 	}
 
 	if surfaceOrRenderer == "s" {
@@ -427,10 +432,6 @@ func updateScreen(surfaceOrRenderer string) {
 	if surfaceOrRenderer == "r" {
 		renderer.Present()
 	}
-	//fmt.Println(surfaceOrRenderer)
-	fmt.Println("Last time: ", lastTime)
-	fmt.Println("GetTicks:", sdl.GetTicks())
-	fmt.Println("ticksForNextFrame", ticksForNextFrame)
 
-	lastTime = sdl.GetTicks()
+	//lastTime = sdl.GetTicks()
 }
