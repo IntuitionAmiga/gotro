@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"math/rand"
 	"os"
+	"runtime"
 	"time"
 
 	"github.com/veandco/go-sdl2/img"
@@ -86,12 +87,15 @@ func createWindow() *sdl.Window {
 	return window
 }
 func createRenderer() *sdl.Renderer {
-	/*
-		//Disabled because MacOS SDL can't do hardware rendering
-		sdl.SetHint(sdl.HINT_RENDER_VSYNC,"1")
-		renderer, errCreatingSDLRenderer := sdl.CreateRenderer(window, -1, sdl.RENDERER_ACCELERATED|sdl.RENDERER_PRESENTVSYNC|sdl.RENDERER_TARGETTEXTURE)
-	*/
-	renderer, errCreatingSDLRenderer := sdl.CreateRenderer(window, -1, sdl.RENDERER_SOFTWARE|sdl.RENDERER_TARGETTEXTURE)
+	//Disabled because MacOS SDL can't do hardware rendering
+	var errCreatingSDLRenderer error
+	if runtime.GOOS == "darwin" {
+		renderer, errCreatingSDLRenderer = sdl.CreateRenderer(window, -1, sdl.RENDERER_SOFTWARE|sdl.RENDERER_TARGETTEXTURE)
+	} else {
+		sdl.SetHint(sdl.HINT_RENDER_VSYNC, "1")
+		renderer, errCreatingSDLRenderer = sdl.CreateRenderer(window, -1, sdl.RENDERER_ACCELERATED|sdl.RENDERER_PRESENTVSYNC|sdl.RENDERER_TARGETTEXTURE)
+	}
+
 	if errCreatingSDLRenderer != nil {
 		_, _ = fmt.Fprintf(os.Stderr, "Failed to create renderer: %s\n", errCreatingSDLRenderer)
 		os.Exit(1)
@@ -423,6 +427,10 @@ func updateScreen(surfaceOrRenderer string) {
 	if surfaceOrRenderer == "r" {
 		renderer.Present()
 	}
-	fmt.Println(surfaceOrRenderer)
+	//fmt.Println(surfaceOrRenderer)
+	fmt.Println("Last time: ", lastTime)
+	fmt.Println("GetTicks:", sdl.GetTicks())
+	fmt.Println("ticksForNextFrame", ticksForNextFrame)
+
 	lastTime = sdl.GetTicks()
 }
