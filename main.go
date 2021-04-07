@@ -12,7 +12,7 @@ import (
 )
 
 const (
-	FPS                       = 60
+	FPS                       = 1
 	windowWidth, windowHeight = 800, 600
 )
 
@@ -237,13 +237,12 @@ func copperBars() {
 	var greenY = int32(windowHeight / 3)
 	var blueY = int32((windowHeight / 3) * 2)
 
-	_ = renderer.SetDrawColor(0, 0, 0, 0)
+	//_ = renderer.SetDrawColor(0, 0, 0, 0)
 
 	redBar := func() {
 		for i := int32(0); i <= 35; i++ {
 			//Red
 			redY += i
-			_ = renderer.Clear()
 			_ = surface.FillRect(&sdl.Rect{X: startX - windowWidth, Y: redY + 24, W: windowWidth, H: 4}, sdl.MapRGB(surface.Format, 8, 0, 0))
 			_ = surface.FillRect(&sdl.Rect{X: startX - windowWidth, Y: redY + 20, W: windowWidth, H: 4}, sdl.MapRGB(surface.Format, 16, 0, 0))
 			_ = surface.FillRect(&sdl.Rect{X: startX - windowWidth, Y: redY + 16, W: windowWidth, H: 4}, sdl.MapRGB(surface.Format, 32, 0, 0))
@@ -257,7 +256,6 @@ func copperBars() {
 			_ = surface.FillRect(&sdl.Rect{X: startX - windowWidth, Y: redY - 16, W: windowWidth, H: 4}, sdl.MapRGB(surface.Format, 32, 0, 0))
 			_ = surface.FillRect(&sdl.Rect{X: startX - windowWidth, Y: redY - 20, W: windowWidth, H: 4}, sdl.MapRGB(surface.Format, 16, 0, 0))
 			_ = surface.FillRect(&sdl.Rect{X: startX - windowWidth, Y: redY - 24, W: windowWidth, H: 4}, sdl.MapRGB(surface.Format, 8, 0, 0))
-			//updateScreen()
 			_ = window.UpdateSurface()
 			time.Sleep(time.Second / 8)
 		}
@@ -266,7 +264,6 @@ func copperBars() {
 		for i := int32(0); i <= 35; i++ {
 			//Green
 			greenY += i
-			_ = renderer.Clear()
 			_ = surface.FillRect(&sdl.Rect{X: startX - windowWidth, Y: greenY + 24, W: windowWidth, H: 4}, sdl.MapRGB(surface.Format, 0, 8, 0))
 			_ = surface.FillRect(&sdl.Rect{X: startX - windowWidth, Y: greenY + 20, W: windowWidth, H: 4}, sdl.MapRGB(surface.Format, 0, 16, 0))
 			_ = surface.FillRect(&sdl.Rect{X: startX - windowWidth, Y: greenY + 16, W: windowWidth, H: 4}, sdl.MapRGB(surface.Format, 0, 32, 0))
@@ -280,7 +277,6 @@ func copperBars() {
 			_ = surface.FillRect(&sdl.Rect{X: startX - windowWidth, Y: greenY - 16, W: windowWidth, H: 4}, sdl.MapRGB(surface.Format, 0, 32, 0))
 			_ = surface.FillRect(&sdl.Rect{X: startX - windowWidth, Y: greenY - 20, W: windowWidth, H: 4}, sdl.MapRGB(surface.Format, 0, 16, 0))
 			_ = surface.FillRect(&sdl.Rect{X: startX - windowWidth, Y: greenY - 24, W: windowWidth, H: 4}, sdl.MapRGB(surface.Format, 0, 8, 0))
-			//updateScreen()
 			_ = window.UpdateSurface()
 			time.Sleep(time.Second / 8)
 		}
@@ -289,7 +285,6 @@ func copperBars() {
 		for i := int32(0); i <= 35; i++ {
 			//Blue
 			blueY += i
-			_ = renderer.Clear()
 			_ = surface.FillRect(&sdl.Rect{X: startX - windowWidth, Y: blueY + 24, W: windowWidth, H: 4}, sdl.MapRGB(surface.Format, 0, 0, 8))
 			_ = surface.FillRect(&sdl.Rect{X: startX - windowWidth, Y: blueY + 20, W: windowWidth, H: 4}, sdl.MapRGB(surface.Format, 0, 0, 16))
 			_ = surface.FillRect(&sdl.Rect{X: startX - windowWidth, Y: blueY + 16, W: windowWidth, H: 4}, sdl.MapRGB(surface.Format, 0, 0, 32))
@@ -303,7 +298,6 @@ func copperBars() {
 			_ = surface.FillRect(&sdl.Rect{X: startX - windowWidth, Y: blueY - 16, W: windowWidth, H: 4}, sdl.MapRGB(surface.Format, 0, 0, 32))
 			_ = surface.FillRect(&sdl.Rect{X: startX - windowWidth, Y: blueY - 20, W: windowWidth, H: 4}, sdl.MapRGB(surface.Format, 0, 0, 16))
 			_ = surface.FillRect(&sdl.Rect{X: startX - windowWidth, Y: blueY - 24, W: windowWidth, H: 4}, sdl.MapRGB(surface.Format, 0, 0, 8))
-			//updateScreen()
 			_ = window.UpdateSurface()
 			time.Sleep(time.Second / 8)
 		}
