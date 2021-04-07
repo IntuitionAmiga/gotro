@@ -417,10 +417,10 @@ func updateScreen(surfaceOrRenderer string) {
 	var lastTime uint32 = 0
 	const ticksForNextFrame = 1000 / FPS
 
+	lastTime = sdl.GetTicks()
 	for lastTime-sdl.GetTicks() < ticksForNextFrame {
 		sdl.Delay(1)
-		lastTime = sdl.GetTicks()
-		fmt.Println(surfaceOrRenderer)
+
 		fmt.Println("Last time: ", lastTime)
 		fmt.Println("GetTicks:", sdl.GetTicks())
 		fmt.Println("ticksForNextFrame", ticksForNextFrame)
@@ -432,6 +432,6 @@ func updateScreen(surfaceOrRenderer string) {
 	if surfaceOrRenderer == "r" {
 		renderer.Present()
 	}
-
+	fmt.Println(surfaceOrRenderer)
 	//lastTime = sdl.GetTicks()
 }
