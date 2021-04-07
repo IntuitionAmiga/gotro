@@ -115,8 +115,7 @@ func showKickstart() error {
 		return fmt.Errorf("couldn't copy texture: %v", err)
 	}
 	_ = renderer.SetDrawColor(255, 255, 255, 0)
-	updateScreen()
-	//_ = renderer.Clear()
+	updateScreen("r")
 	return err
 }
 func playFloppySounds() {
@@ -147,7 +146,7 @@ func playFloppySounds() {
 }
 func backgroundFill(R, G, B uint8) {
 	_ = surface.FillRect(nil, sdl.MapRGB(surface.Format, R, G, B))
-	updateScreen()
+	updateScreen("r")
 	_ = renderer.Clear()
 }
 func playMusic() {
@@ -187,7 +186,7 @@ func wipeToLeft(R, G, B uint8) {
 	for i = 1; i <= (windowWidth / 2); i++ {
 		//time.Sleep(time.Second / 270)
 		_ = surface.FillRect(&sdl.Rect{X: (windowWidth / 2) - i, W: i, H: windowHeight}, sdl.MapRGB(surface.Format, R, G, B))
-		updateScreen()
+		updateScreen("s")
 	}
 }
 func wipeToRight(R, G, B uint8) {
@@ -196,7 +195,7 @@ func wipeToRight(R, G, B uint8) {
 	for i = 1; i <= (windowWidth / 2); i++ {
 		//time.Sleep(time.Second / 270)
 		_ = surface.FillRect(&sdl.Rect{X: ((windowWidth / 2) - 1) + i, W: i, H: windowHeight}, sdl.MapRGB(surface.Format, R, G, B))
-		updateScreen()
+		updateScreen("s")
 	}
 }
 func drawSprite(x, y int32, R, G, B uint8) {
@@ -207,7 +206,9 @@ func drawSprite(x, y int32, R, G, B uint8) {
 	_ = renderer.SetDrawColor(R, G, B, 255)
 	_ = renderer.Clear()
 	_ = renderer.Copy(texture, &src, &dst)
-	renderer.Present()
+	//renderer.Present()
+	updateScreen("r")
+
 }
 func boingBall(R, G, B uint8) {
 	_ = renderer.Clear()
@@ -256,7 +257,8 @@ func copperBars() {
 			_ = surface.FillRect(&sdl.Rect{X: startX - windowWidth, Y: redY - 16, W: windowWidth, H: 4}, sdl.MapRGB(surface.Format, 32, 0, 0))
 			_ = surface.FillRect(&sdl.Rect{X: startX - windowWidth, Y: redY - 20, W: windowWidth, H: 4}, sdl.MapRGB(surface.Format, 16, 0, 0))
 			_ = surface.FillRect(&sdl.Rect{X: startX - windowWidth, Y: redY - 24, W: windowWidth, H: 4}, sdl.MapRGB(surface.Format, 8, 0, 0))
-			_ = window.UpdateSurface()
+			//_ = window.UpdateSurface()
+			updateScreen("s")
 			time.Sleep(time.Second / 8)
 		}
 	}
@@ -277,7 +279,8 @@ func copperBars() {
 			_ = surface.FillRect(&sdl.Rect{X: startX - windowWidth, Y: greenY - 16, W: windowWidth, H: 4}, sdl.MapRGB(surface.Format, 0, 32, 0))
 			_ = surface.FillRect(&sdl.Rect{X: startX - windowWidth, Y: greenY - 20, W: windowWidth, H: 4}, sdl.MapRGB(surface.Format, 0, 16, 0))
 			_ = surface.FillRect(&sdl.Rect{X: startX - windowWidth, Y: greenY - 24, W: windowWidth, H: 4}, sdl.MapRGB(surface.Format, 0, 8, 0))
-			_ = window.UpdateSurface()
+			//_ = window.UpdateSurface()
+			updateScreen("s")
 			time.Sleep(time.Second / 8)
 		}
 	}
@@ -298,7 +301,8 @@ func copperBars() {
 			_ = surface.FillRect(&sdl.Rect{X: startX - windowWidth, Y: blueY - 16, W: windowWidth, H: 4}, sdl.MapRGB(surface.Format, 0, 0, 32))
 			_ = surface.FillRect(&sdl.Rect{X: startX - windowWidth, Y: blueY - 20, W: windowWidth, H: 4}, sdl.MapRGB(surface.Format, 0, 0, 16))
 			_ = surface.FillRect(&sdl.Rect{X: startX - windowWidth, Y: blueY - 24, W: windowWidth, H: 4}, sdl.MapRGB(surface.Format, 0, 0, 8))
-			_ = window.UpdateSurface()
+			//_ = window.UpdateSurface()
+			updateScreen("s")
 			time.Sleep(time.Second / 8)
 		}
 	}
@@ -315,7 +319,7 @@ func copperBars() {
 		_ = surface.FillRect(&sdl.Rect{X: startX - int32(i), Y: startY + 16, W: 1, H: 16}, sdl.MapRGB(surface.Format, 0, 0, 255))
 		_ = surface.FillRect(&sdl.Rect{X: startX - int32(i), Y: startY + 32, W: 1, H: 16}, sdl.MapRGB(surface.Format, 46, 43, 95))
 		_ = surface.FillRect(&sdl.Rect{X: startX - int32(i), Y: startY + 48, W: 1, H: 16}, sdl.MapRGB(surface.Format, 139, 0, 255))
-		updateScreen()
+		updateScreen("s")
 	}
 }
 func wipeTopDown(R, G, B uint8) {
@@ -323,7 +327,7 @@ func wipeTopDown(R, G, B uint8) {
 	//Clear top to bottom
 	for i = 1; i <= windowHeight; i++ {
 		_ = surface.FillRect(&sdl.Rect{W: windowWidth, H: 0 + i}, sdl.MapRGB(surface.Format, R, G, B))
-		updateScreen()
+		updateScreen("s")
 	}
 }
 func drawCircle(x0, y0, r int32, R, G, B uint8) {
@@ -352,7 +356,9 @@ func drawCircle(x0, y0, r int32, R, G, B uint8) {
 			err += dx - (r * 2)
 		}
 	}
-	renderer.Present()
+	//renderer.Present()
+	updateScreen("r")
+
 }
 func drawBubbles() {
 	_ = renderer.SetDrawColor(0, 0, 0, 0)
@@ -379,7 +385,7 @@ func horizontalBars(R1, G1, B1, R2, G2, B2 uint8) {
 		_ = surface.FillRect(&sdl.Rect{X: windowWidth - i, Y: 300, W: 60, H: 60}, sdl.MapRGB(surface.Format, R2, G2, B2))
 		_ = surface.FillRect(&sdl.Rect{X: windowWidth - i, Y: 420, W: 60, H: 60}, sdl.MapRGB(surface.Format, R2, G2, B2))
 		_ = surface.FillRect(&sdl.Rect{X: windowWidth - i, Y: 540, W: 60, H: 60}, sdl.MapRGB(surface.Format, R2, G2, B2))
-		updateScreen()
+		updateScreen("s")
 	}
 }
 func horizontalBars2(R1, G1, B1, R2, G2, B2 uint8) {
@@ -400,17 +406,23 @@ func horizontalBars2(R1, G1, B1, R2, G2, B2 uint8) {
 		_ = surface.FillRect(&sdl.Rect{X: 0 + i, Y: 240, W: 60, H: 60}, sdl.MapRGB(surface.Format, R2, G2, B2))
 		_ = surface.FillRect(&sdl.Rect{X: 0 + i, Y: 360, W: 60, H: 60}, sdl.MapRGB(surface.Format, R2, G2, B2))
 		_ = surface.FillRect(&sdl.Rect{X: 0 + i, Y: 480, W: 60, H: 60}, sdl.MapRGB(surface.Format, R2, G2, B2))
-		updateScreen()
+		updateScreen("s")
 	}
 }
-func updateScreen() {
+func updateScreen(surfaceOrRenderer string) {
 	var lastTime uint32 = 0
 	const ticksForNextFrame = 1000 / FPS
 
 	for lastTime-sdl.GetTicks() < ticksForNextFrame {
 		sdl.Delay(1)
 	}
-	_ = window.UpdateSurface()
-	renderer.Present()
+
+	if surfaceOrRenderer == "s" {
+		_ = window.UpdateSurface()
+	}
+	if surfaceOrRenderer == "r" {
+		renderer.Present()
+	}
+	fmt.Println(surfaceOrRenderer)
 	lastTime = sdl.GetTicks()
 }
