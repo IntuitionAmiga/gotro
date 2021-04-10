@@ -1,10 +1,10 @@
 package main
 
+import "C"
 import (
 	"fmt"
 	"math/rand"
 	"os"
-	"runtime"
 	"time"
 
 	"github.com/veandco/go-sdl2/img"
@@ -13,7 +13,7 @@ import (
 )
 
 const (
-	FPS                       = 1
+	FPS                       = 60
 	windowWidth, windowHeight = 800, 600
 )
 
@@ -87,14 +87,15 @@ func createWindow() *sdl.Window {
 	return window
 }
 func createRenderer() *sdl.Renderer {
-	//Disabled because MacOS SDL can't do hardware rendering
-	var errCreatingSDLRenderer error
-	if runtime.GOOS == "darwin" {
-		renderer, errCreatingSDLRenderer = sdl.CreateRenderer(window, -1, sdl.RENDERER_SOFTWARE|sdl.RENDERER_TARGETTEXTURE)
-	} else {
-		sdl.SetHint(sdl.HINT_RENDER_VSYNC, "1")
-		renderer, errCreatingSDLRenderer = sdl.CreateRenderer(window, -1, sdl.RENDERER_ACCELERATED|sdl.RENDERER_PRESENTVSYNC|sdl.RENDERER_TARGETTEXTURE)
+	var info *sdl.RendererInfo
+	_, err := sdl.GetRenderDriverInfo(-1, info)
+	if err != nil {
+		return nil
 	}
+
+	var errCreatingSDLRenderer error
+	sdl.SetHint(sdl.HINT_RENDER_VSYNC, "1")
+	renderer, errCreatingSDLRenderer = sdl.CreateRenderer(window, -1, sdl.RENDERER_ACCELERATED|sdl.RENDERER_PRESENTVSYNC|sdl.RENDERER_TARGETTEXTURE)
 
 	if errCreatingSDLRenderer != nil {
 		_, _ = fmt.Fprintf(os.Stderr, "Failed to create renderer: %s\n", errCreatingSDLRenderer)
@@ -366,6 +367,7 @@ func drawCircle(x0, y0, r int32, R, G, B uint8) {
 }
 func drawBubbles() {
 	_ = renderer.SetDrawColor(0, 0, 0, 0)
+	_ = renderer.Clear()
 	for i := 0; i <= 300; i++ {
 		drawCircle(int32(rand.Intn(800)), int32(rand.Intn(600)), int32(rand.Intn(80)), uint8(rand.Intn(255)), uint8(rand.Intn(255)), uint8(rand.Intn(255)))
 	}
@@ -423,15 +425,11 @@ func updateScreen(surfaceOrRenderer string) {
 
 		fmt.Println("Last time: ", lastTime)
 		fmt.Println("GetTicks:", sdl.GetTicks())
-		fmt.Println("ticksForNextFrame", ticksForNextFrame)
 	}
-
 	if surfaceOrRenderer == "s" {
 		_ = window.UpdateSurface()
 	}
 	if surfaceOrRenderer == "r" {
 		renderer.Present()
 	}
-	fmt.Println(surfaceOrRenderer)
-	//lastTime = sdl.GetTicks()
 }
