@@ -1,6 +1,5 @@
 package main
 
-import "C"
 import (
 	"fmt"
 	"math/rand"
@@ -96,6 +95,7 @@ func createRenderer() *sdl.Renderer {
 	var errCreatingSDLRenderer error
 	sdl.SetHint(sdl.HINT_RENDER_VSYNC, "1")
 	renderer, errCreatingSDLRenderer = sdl.CreateRenderer(window, -1, sdl.RENDERER_ACCELERATED|sdl.RENDERER_PRESENTVSYNC|sdl.RENDERER_TARGETTEXTURE)
+	//renderer, errCreatingSDLRenderer = sdl.CreateRenderer(window, -1, sdl.RENDERER_SOFTWARE)
 
 	if errCreatingSDLRenderer != nil {
 		_, _ = fmt.Fprintf(os.Stderr, "Failed to create renderer: %s\n", errCreatingSDLRenderer)
@@ -416,15 +416,18 @@ func horizontalBars2(R1, G1, B1, R2, G2, B2 uint8) {
 	}
 }
 func updateScreen(surfaceOrRenderer string) {
-	var lastTime uint32 = 0
-	const ticksForNextFrame = 1000 / FPS
+	//var lastTime
+	const ticksForNextFrame uint32 = 1000 / FPS
 
-	lastTime = sdl.GetTicks()
-	for lastTime-sdl.GetTicks() < ticksForNextFrame {
-		sdl.Delay(1)
+	lastTime := sdl.GetTicks()
 
-		fmt.Println("Last time: ", lastTime)
-		fmt.Println("GetTicks:", sdl.GetTicks())
+	if sdl.GetTicks()-lastTime < ticksForNextFrame {
+		//sdl.Delay(1)
+		time.Sleep(time.Second/1000)
+		fmt.Println("\nlastTime: ", lastTime)
+		fmt.Println("ticksForNextFrame: ", ticksForNextFrame)
+		fmt.Println("sdl.GetTicks(): ", sdl.GetTicks())
+		fmt.Println("GetTicks()-lastTime: ", sdl.GetTicks()-lastTime)
 	}
 	if surfaceOrRenderer == "s" {
 		_ = window.UpdateSurface()
