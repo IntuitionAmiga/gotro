@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"math/rand"
 	"os"
+	"runtime"
 	"time"
 
 	"github.com/veandco/go-sdl2/img"
@@ -22,6 +23,7 @@ var surface *sdl.Surface
 
 func main() {
 	sdlInitVideo()
+	imgInit()
 	window = createWindow()
 	renderer = createRenderer()
 	surface = createSurface()
@@ -71,13 +73,22 @@ func sdlInitVideo() {
 
 	defer sdl.Quit()
 }
+func imgInit() {
+	err := img.Init(img.INIT_PNG)
+	if err != nil {
+		_, _ = fmt.Fprintf(os.Stderr, "Failed to initialise image lib: %s\n", err)
+		os.Exit(1)
+	}
+
+	defer img.Quit()
+}
 func createWindow() *sdl.Window {
 	window, errCreatingSDLWindow := sdl.CreateWindow("Gotro by Intuition",
 		sdl.WINDOWPOS_CENTERED,
 		sdl.WINDOWPOS_CENTERED,
 		windowWidth,
 		windowHeight,
-		sdl.WINDOW_SHOWN)
+		sdl.WINDOW_SHOWN|sdl.WINDOW_OPENGL)
 
 	if errCreatingSDLWindow != nil {
 		_, _ = fmt.Fprintf(os.Stderr, "Failed to create SDL window: %s\n", errCreatingSDLWindow)
@@ -86,16 +97,15 @@ func createWindow() *sdl.Window {
 	return window
 }
 func createRenderer() *sdl.Renderer {
-	var info *sdl.RendererInfo
-	_, err := sdl.GetRenderDriverInfo(-1, info)
-	if err != nil {
-		return nil
-	}
-
 	var errCreatingSDLRenderer error
 	sdl.SetHint(sdl.HINT_RENDER_VSYNC, "1")
+	if runtime.GOOS == "darwin" {
+		sdl.SetHint(sdl.HINT_RENDER_DRIVER, "software")
+	} else {
+		sdl.SetHint(sdl.HINT_RENDER_DRIVER, "opengl")
+	}
 	renderer, errCreatingSDLRenderer = sdl.CreateRenderer(window, -1, sdl.RENDERER_ACCELERATED|sdl.RENDERER_PRESENTVSYNC|sdl.RENDERER_TARGETTEXTURE)
-	//renderer, errCreatingSDLRenderer = sdl.CreateRenderer(window, -1, sdl.RENDERER_SOFTWARE)
+	//fmt.Println(renderer.GetInfo())
 
 	if errCreatingSDLRenderer != nil {
 		_, _ = fmt.Fprintf(os.Stderr, "Failed to create renderer: %s\n", errCreatingSDLRenderer)
@@ -112,16 +122,32 @@ func createSurface() *sdl.Surface {
 	return surface
 }
 func showKickstart() error {
-	t, err := img.LoadTexture(renderer, "kick13.png")
+	/*
+		t, err := img.LoadTexture(renderer, "kick13.png")
+		if err != nil {
+			return fmt.Errorf("couldn't load image from disk")
+		}
+		if err := renderer.Copy(t, nil, nil); err != nil {
+			return fmt.Errorf("couldn't copy texture: %v", err)
+		}
+		_ = renderer.SetDrawColor(255, 255, 255, 0)
+		//updateScreen("r")
+		renderer.Present()
+		return err
+	*/
+	kickrect := sdl.Rect{W: 800, H: 600}
+	s, _ := img.Load("kick13.png")
+	t, _ := renderer.CreateTextureFromSurface(s)
+	err := renderer.Copy(t, nil, &kickrect)
 	if err != nil {
-		return fmt.Errorf("couldn't load image from disk")
+		return err
 	}
-	if err := renderer.Copy(t, nil, nil); err != nil {
-		return fmt.Errorf("couldn't copy texture: %v", err)
-	}
-	_ = renderer.SetDrawColor(255, 255, 255, 0)
 	updateScreen("r")
-	return err
+	err = renderer.Clear()
+	if err != nil {
+		return err
+	}
+	return nil
 }
 func playFloppySounds() {
 	errSDLAudioInit := sdl.Init(sdl.INIT_AUDIO)
@@ -213,7 +239,6 @@ func drawSprite(x, y int32, R, G, B uint8) {
 	_ = renderer.Copy(texture, &src, &dst)
 	//renderer.Present()
 	updateScreen("r")
-
 }
 func boingBall(R, G, B uint8) {
 	_ = renderer.Clear()
@@ -423,11 +448,12 @@ func updateScreen(surfaceOrRenderer string) {
 
 	if sdl.GetTicks()-lastTime < ticksForNextFrame {
 		//sdl.Delay(1)
-		time.Sleep(time.Second/1000)
+		/*time.Sleep(time.Second / 1000)
 		fmt.Println("\nlastTime: ", lastTime)
 		fmt.Println("ticksForNextFrame: ", ticksForNextFrame)
 		fmt.Println("sdl.GetTicks(): ", sdl.GetTicks())
 		fmt.Println("GetTicks()-lastTime: ", sdl.GetTicks()-lastTime)
+		*/
 	}
 	if surfaceOrRenderer == "s" {
 		_ = window.UpdateSurface()
