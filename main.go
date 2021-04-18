@@ -4,7 +4,6 @@ import (
 	"fmt"
 	"math/rand"
 	"os"
-	"runtime"
 	"time"
 
 	"github.com/veandco/go-sdl2/img"
@@ -65,7 +64,7 @@ func main() {
 
 }
 func sdlInitVideo() {
-	err := sdl.Init(sdl.INIT_VIDEO)
+	err := sdl.Init(sdl.INIT_EVERYTHING)
 	if err != nil {
 		_, _ = fmt.Fprintf(os.Stderr, "Failed to initialise video: %s\n", err)
 		os.Exit(1)
@@ -97,15 +96,33 @@ func createWindow() *sdl.Window {
 	return window
 }
 func createRenderer() *sdl.Renderer {
+
+	var numDrivers, _ = sdl.GetNumRenderDrivers()
+	fmt.Println(numDrivers)
+
 	var errCreatingSDLRenderer error
 	sdl.SetHint(sdl.HINT_RENDER_VSYNC, "1")
-	if runtime.GOOS == "darwin" {
-		sdl.SetHint(sdl.HINT_RENDER_DRIVER, "software")
-	} else {
-		sdl.SetHint(sdl.HINT_RENDER_DRIVER, "opengl")
-	}
+	/*if runtime.GOOS == "darwin" {
+		sdl.SetHint(sdl.HINT_RENDER_DRIVER, "metal")
+	} else {*/
+	sdl.SetHint(sdl.HINT_RENDER_DRIVER, "opengl")
+	//}
 	renderer, errCreatingSDLRenderer = sdl.CreateRenderer(window, -1, sdl.RENDERER_ACCELERATED|sdl.RENDERER_PRESENTVSYNC|sdl.RENDERER_TARGETTEXTURE)
-	//fmt.Println(renderer.GetInfo())
+
+	for i := 0; i < numDrivers; i++ {
+		driverInfo, _ := renderer.GetInfo()
+		fmt.Println("Driver name (", i, "): ", driverInfo.Name)
+		/*if (driverInfo.Name == "SDL_RENDERER_SOFTWARE") {fmt.Println(" the renderer is a software fallback")}
+		if (driverInfo.Name == "SDL_RENDERER_ACCELERATED") {fmt.Println(" the renderer uses hardware acceleration")}
+		if (driverInfo.Name == "SDL_RENDERER_PRESENTVSYNC") {fmt.Println(" present	is synchronized with the refresh rate")}
+		if (driverInfo.Name == "SDL_RENDERER_TARGETTEXTURE") {fmt.Println( " the renderer supports rendering to texture")}
+		*/
+	}
+
+	/*var info sdl.RendererInfo
+	info, _ =renderer.GetInfo()
+	fmt.Println(info.Name)
+	*/
 
 	if errCreatingSDLRenderer != nil {
 		_, _ = fmt.Fprintf(os.Stderr, "Failed to create renderer: %s\n", errCreatingSDLRenderer)
