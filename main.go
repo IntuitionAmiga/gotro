@@ -35,9 +35,9 @@ func main() {
 
 	backgroundFill(255, 255, 255) //Fill bg with white
 	time.Sleep(time.Second * 9)
+	decrunch()
 
 	playMusic()
-	//rainbowScroll()
 
 	wipeLeft(255, 0, 90)
 	wipeRight(0, 120, 128)
@@ -48,6 +48,7 @@ func main() {
 	boingBall(255, 0, 90)
 
 	rasterBars()
+	rainbowScroll()
 
 	wipeTopDown(0, 0, 0)
 	drawBubbles()
@@ -56,7 +57,8 @@ func main() {
 	wipeRight(0, 120, 128)
 
 	horizontalBars(255, 0, 90, 0, 255, 200)
-	horizontalBars2(0, 120, 128, 255, 0, 128)
+	//horizontalBars2(0, 120, 128, 255, 0, 128)
+	horizontalBars2(139, 0, 255, 255, 0, 128)
 
 	wipeLeft(0, 0, 0)
 	wipeRight(0, 0, 0)
@@ -198,6 +200,43 @@ func backgroundFill(R, G, B uint8) {
 	drawFillRect(0, 0, windowWidth, windowHeight, R, G, B)
 	updateScreen()
 	_ = renderer.Clear()
+}
+func decrunch() {
+	var startY, n int32 = 0, 0
+	for x := 0; x <= 120; x++ {
+		n = 0
+		for i := 0; i <= windowHeight; i++ {
+			drawFillRect(0, n+startY, windowWidth, 8, 46, 43, 95)
+			drawFillRect(0, n+startY+8, windowWidth, 8, 255, 0, 0)
+			drawFillRect(0, n+startY+16, windowWidth, 8, 139, 0, 255)
+			drawFillRect(0, n+startY+24, windowWidth, 8, 255, 255, 0)
+			drawFillRect(0, n+startY+32, windowWidth, 8, 0, 255, 0)
+			n += 40
+		}
+		updateScreen()
+		n = 0
+		for i := 0; i <= windowHeight; i++ {
+			drawFillRect(0, n+startY, windowWidth, 4, 0, 255, 0)
+			drawFillRect(0, n+startY+6, windowWidth, 4, 255, 255, 0)
+			drawFillRect(0, n+startY+14, windowWidth, 4, 46, 43, 95)
+			drawFillRect(0, n+startY+22, windowWidth, 4, 255, 0, 0)
+			drawFillRect(0, n+startY+30, windowWidth, 4, 139, 0, 255)
+			n += 40
+		}
+		updateScreen()
+		n = 0
+		for i := 0; i <= windowHeight; i++ {
+			drawFillRect(0, n+startY, windowWidth, 12, 70, 55, 0)
+			drawFillRect(0, n+startY+11, windowWidth, 12, 55, 25, 70)
+			drawFillRect(0, n+startY+19, windowWidth, 12, 46, 113, 5)
+			drawFillRect(0, n+startY+27, windowWidth, 12, 25, 0, 70)
+			drawFillRect(0, n+startY+35, windowWidth, 12, 13, 70, 55)
+			n += 40
+		}
+		updateScreen()
+	}
+	backgroundFill(255, 255, 255) //Fill bg with white
+	sdl.Delay(1000)
 }
 func playMusic() {
 	errSDLAudioInit := sdl.Init(sdl.INIT_AUDIO)
@@ -363,20 +402,19 @@ func rasterBars() {
 	greenBar()
 	blueBar()
 }
-
-/*func rainbowScroll(){
+func rainbowScroll() {
 	var startY int32 = windowHeight/2 + 16
 	for i := 0; i < windowWidth; i++ {
-		drawFillRect(windowWidth-int32(i), startY-48, 1, 16, 255, 0, 0)
-		drawFillRect(windowWidth-int32(i), startY-32, 1, 16, 255, 127, 0)
-		drawFillRect(windowWidth-int32(i), startY-16, 1, 16, 255, 255, 0)
-		drawFillRect(windowWidth-int32(i), startY,    1, 16, 0, 255, 0)
-		drawFillRect(windowWidth-int32(i), startY+16, 1, 16, 0, 0, 255)
-		drawFillRect(windowWidth-int32(i), startY+32, 1, 16, 46, 43, 95)
-		drawFillRect(windowWidth-int32(i), startY+48, 1, 16, 139, 0, 255)
-	    updateScreen()
+		drawFillRect(windowWidth-int32(i), startY-48, 30, 16, 255, 0, 0)
+		drawFillRect(windowWidth-int32(i), startY-32, 30, 16, 255, 127, 0)
+		drawFillRect(windowWidth-int32(i), startY-16, 30, 16, 255, 255, 0)
+		drawFillRect(windowWidth-int32(i), startY, 30, 16, 0, 255, 0)
+		drawFillRect(windowWidth-int32(i), startY+16, 30, 16, 0, 0, 255)
+		drawFillRect(windowWidth-int32(i), startY+32, 30, 16, 46, 43, 95)
+		drawFillRect(windowWidth-int32(i), startY+48, 30, 16, 139, 0, 255)
+		updateScreen()
 	}
-}*/
+}
 func wipeTopDown(R, G, B uint8) {
 	var i int32
 	//Clear top to bottom
@@ -427,8 +465,6 @@ func drawBubbles() {
 func horizontalBars(R1, G1, B1, R2, G2, B2 uint8) {
 	var i int32
 	// Horizontal bars
-	//_ = renderer.SetDrawColor(0, 120, 128,0)
-	//_ = renderer.Clear()
 	for i = 1; i < windowWidth; i++ {
 		//L2R
 		drawFillRect(0+i, 0, 60, 60, R1, G1, B1)
