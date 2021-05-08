@@ -18,14 +18,13 @@ const (
 
 var window *sdl.Window
 var renderer *sdl.Renderer
-var surface *sdl.Surface
 
 func main() {
 	sdlInitVideo()
-	imgInit()
+	sdlInitImage()
+	sdlInitAudio()
 	window = createWindow()
 	renderer = createRenderer()
-	surface = createSurface()
 	var _ = sdl.PollEvent() //MacOS won't draw the window without this line
 
 	//Start intro
@@ -35,12 +34,13 @@ func main() {
 
 	backgroundFill(255, 255, 255) //Fill bg with white
 	time.Sleep(time.Second * 9)
-	decrunch()
+	decrunch(100)
 
 	playMusic()
 
 	wipeLeft(255, 0, 90)
 	wipeRight(0, 120, 128)
+	horizontalBars2(30, 0, 95, 30, 055, 200)
 	wipeLeft(0, 120, 128)
 	wipeRight(255, 0, 90)
 	wipeLeft(255, 0, 90)
@@ -53,12 +53,11 @@ func main() {
 	wipeTopDown(0, 0, 0)
 	drawBubbles()
 
-	wipeLeft(0, 120, 128)
-	wipeRight(0, 120, 128)
+	wipeLeft(95, 95, 0)
+	wipeRight(0, 95, 0)
 
-	horizontalBars(255, 0, 90, 0, 255, 200)
-	//horizontalBars2(0, 120, 128, 255, 0, 128)
-	horizontalBars2(139, 0, 255, 255, 0, 128)
+	horizontalBars(0, 0, 95, 0, 055, 200)
+	horizontalBars(30, 0, 95, 30, 055, 200)
 
 	wipeLeft(0, 0, 0)
 	wipeRight(0, 0, 0)
@@ -76,7 +75,7 @@ func sdlInitVideo() {
 
 	defer sdl.Quit()
 }
-func imgInit() {
+func sdlInitImage() {
 	err := img.Init(img.INIT_PNG)
 	if err != nil {
 		_, _ = fmt.Fprintf(os.Stderr, "Failed to initialise image lib: %s\n", err)
@@ -84,6 +83,26 @@ func imgInit() {
 	}
 
 	defer img.Quit()
+}
+func sdlInitAudio() {
+	errSDLAudioInit := sdl.Init(sdl.INIT_AUDIO)
+	if errSDLAudioInit != nil {
+		_, _ = fmt.Fprintf(os.Stderr, "Failed to initialise audio: %s\n", errSDLAudioInit)
+		os.Exit(1)
+	}
+
+	errOpeningAudioDevice := mix.OpenAudio(44100, mix.DEFAULT_FORMAT, 2, 4096)
+	if errOpeningAudioDevice != nil {
+		_, _ = fmt.Fprintf(os.Stderr, "Failed to open audio device: %s\n", errOpeningAudioDevice)
+		os.Exit(1)
+	}
+
+	errSDLMixerInit := mix.Init(mix.INIT_MOD)
+	if errSDLMixerInit != nil {
+		_, _ = fmt.Fprintf(os.Stderr, "Failed to initialise mixer: %s\n", errSDLMixerInit)
+		os.Exit(1)
+	}
+
 }
 func createWindow() *sdl.Window {
 	window, errCreatingSDLWindow := sdl.CreateWindow("Gotro by Intuition",
@@ -113,15 +132,16 @@ func createRenderer() *sdl.Renderer {
 	}
 	renderer, errCreatingSDLRenderer = sdl.CreateRenderer(window, -1, sdl.RENDERER_ACCELERATED|sdl.RENDERER_PRESENTVSYNC|sdl.RENDERER_TARGETTEXTURE)
 
-	for i := 0; i < numDrivers; i++ {
-		driverInfo, _ := renderer.GetInfo()
-		fmt.Println("Driver name (", i, "): ", driverInfo.Name)
-		/*if (driverInfo.Name == "SDL_RENDERER_SOFTWARE") {fmt.Println(" the renderer is a software fallback")}
-		if (driverInfo.Name == "SDL_RENDERER_ACCELERATED") {fmt.Println(" the renderer uses hardware acceleration")}
-		if (driverInfo.Name == "SDL_RENDERER_PRESENTVSYNC") {fmt.Println(" present	is synchronized with the refresh rate")}
-		if (driverInfo.Name == "SDL_RENDERER_TARGETTEXTURE") {fmt.Println( " the renderer supports rendering to texture")}
-		*/
-	}
+	/*
+		for i := 0; i < numDrivers; i++ {
+			driverInfo, _ := renderer.GetInfo()
+			fmt.Println("Driver name (", i, "): ", driverInfo.Name)
+			//if (driverInfo.Name == "SDL_RENDERER_SOFTWARE") {fmt.Println(" the renderer is a software fallback")}
+			//if (driverInfo.Name == "SDL_RENDERER_ACCELERATED") {fmt.Println(" the renderer uses hardware acceleration")}
+			//if (driverInfo.Name == "SDL_RENDERER_PRESENTVSYNC") {fmt.Println(" present	is synchronized with the refresh rate")}
+			//if (driverInfo.Name == "SDL_RENDERER_TARGETTEXTURE") {fmt.Println( " the renderer supports rendering to texture")}
+		}
+	*/
 
 	/*var info sdl.RendererInfo
 	info, _ =renderer.GetInfo()
@@ -133,14 +153,6 @@ func createRenderer() *sdl.Renderer {
 		os.Exit(1)
 	}
 	return renderer
-}
-func createSurface() *sdl.Surface {
-	surface, errCreatingSDLSurface := window.GetSurface()
-	if errCreatingSDLSurface != nil {
-		_, _ = fmt.Fprint(os.Stderr, "Failed to create window surface: \n", errCreatingSDLSurface)
-		os.Exit(1)
-	}
-	return surface
 }
 func showKickstart() error {
 	/*
@@ -171,24 +183,6 @@ func showKickstart() error {
 	return nil
 }
 func playFloppySounds() {
-	errSDLAudioInit := sdl.Init(sdl.INIT_AUDIO)
-	if errSDLAudioInit != nil {
-		_, _ = fmt.Fprintf(os.Stderr, "Failed to initialise audio: %s\n", errSDLAudioInit)
-		os.Exit(1)
-	}
-
-	errOpeningAudioDevice := mix.OpenAudio(22050, mix.DEFAULT_FORMAT, 2, 4096)
-	if errOpeningAudioDevice != nil {
-		_, _ = fmt.Fprintf(os.Stderr, "Failed to open audio device: %s\n", errOpeningAudioDevice)
-		os.Exit(1)
-	}
-
-	errSDLMixerInit := mix.Init(mix.INIT_MP3)
-	if errSDLMixerInit != nil {
-		_, _ = fmt.Fprintf(os.Stderr, "Failed to initialise mixer: %s\n", errSDLMixerInit)
-		os.Exit(1)
-	}
-
 	if music, errLoadingMusic := mix.LoadMUS("./floppy.mp3"); errLoadingMusic != nil {
 		_, _ = fmt.Fprintf(os.Stderr, "Failed to load music from disk: %s\n", errLoadingMusic)
 		os.Exit(1)
@@ -201,9 +195,9 @@ func backgroundFill(R, G, B uint8) {
 	updateScreen()
 	_ = renderer.Clear()
 }
-func decrunch() {
+func decrunch(loops int) {
 	var startY, n int32 = 0, 0
-	for x := 0; x <= 120; x++ {
+	for x := 0; x <= loops; x++ {
 		n = 0
 		for i := 0; i <= windowHeight; i++ {
 			drawFillRect(0, n+startY, windowWidth, 8, 46, 43, 95)
@@ -239,24 +233,6 @@ func decrunch() {
 	sdl.Delay(1000)
 }
 func playMusic() {
-	errSDLAudioInit := sdl.Init(sdl.INIT_AUDIO)
-	if errSDLAudioInit != nil {
-		_, _ = fmt.Fprintf(os.Stderr, "Failed to initialise audio: %s\n", errSDLAudioInit)
-		os.Exit(1)
-	}
-
-	errOpeningAudioDevice := mix.OpenAudio(22050, mix.DEFAULT_FORMAT, 2, 4096)
-	if errOpeningAudioDevice != nil {
-		_, _ = fmt.Fprintf(os.Stderr, "Failed to open audio device: %s\n", errOpeningAudioDevice)
-		os.Exit(1)
-	}
-
-	errSDLMixerInit := mix.Init(mix.INIT_MOD)
-	if errSDLMixerInit != nil {
-		_, _ = fmt.Fprintf(os.Stderr, "Failed to initialise mixer: %s\n", errSDLMixerInit)
-		os.Exit(1)
-	}
-
 	if music, errLoadingMusic := mix.LoadMUS("echoing.mod"); errLoadingMusic != nil {
 		_, _ = fmt.Fprintf(os.Stderr, "Failed to load music from disk: %s\n", errLoadingMusic)
 		os.Exit(1)
@@ -282,7 +258,7 @@ func wipeLeft(R, G, B uint8) {
 	var i int32 = 0
 	//Mid to left full length screen wipe
 	for i = 0; i <= (windowWidth / 2); i++ {
-		drawFillRect(((windowWidth / 2) - i), 0, i, windowHeight, R, G, B)
+		drawFillRect((windowWidth/2)-i, 0, i, windowHeight, R, G, B)
 		updateScreen()
 	}
 }
@@ -290,7 +266,7 @@ func wipeRight(R, G, B uint8) {
 	var i int32 = 0
 	//Mid to left full length screen wipe
 	for i = 0; i <= (windowWidth / 2); i++ {
-		drawFillRect((windowWidth / 2), 0, i+1, windowHeight, R, G, B)
+		drawFillRect(windowWidth/2, 0, i+1, windowHeight, R, G, B)
 		updateScreen()
 	}
 }
