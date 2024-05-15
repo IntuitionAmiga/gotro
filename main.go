@@ -240,10 +240,26 @@ func playMusic() {
 		_ = music.Play(1)
 	}
 }
-func drawPixel(xpos, ypos int32, R, G, B uint8) {
-	_ = renderer.SetDrawColor(R, G, B, 255)
-	_ = renderer.DrawPoint(xpos, ypos)
+
+//	func drawPixel(xpos, ypos int32, R, G, B uint8) {
+//		_ = renderer.SetDrawColor(R, G, B, 255)
+//		_ = renderer.DrawPoint(xpos, ypos)
+//	}
+var currentColor sdl.Color
+
+func setDrawColor(r, g, b uint8) {
+	color := sdl.Color{R: r, G: g, B: b, A: 255}
+	if color != currentColor {
+		renderer.SetDrawColor(r, g, b, 255)
+		currentColor = color
+	}
 }
+
+func drawPixel(x, y int32, r, g, b uint8) {
+	setDrawColor(r, g, b)
+	renderer.DrawPoint(x, y)
+}
+
 func drawFillRect(X, Y, W, H int32, R, G, B uint8) {
 	_ = renderer.SetDrawColor(R, G, B, 0)
 	_ = renderer.FillRect(&sdl.Rect{
