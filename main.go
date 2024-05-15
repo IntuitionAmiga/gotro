@@ -260,16 +260,33 @@ func drawPixel(x, y int32, r, g, b uint8) {
 	renderer.DrawPoint(x, y)
 }
 
-func drawFillRect(X, Y, W, H int32, R, G, B uint8) {
-	_ = renderer.SetDrawColor(R, G, B, 0)
-	_ = renderer.FillRect(&sdl.Rect{
-		X: X,
-		Y: Y,
-		W: W,
-		H: H,
-	})
-	//updateScreen()
+//func drawFillRect(X, Y, W, H int32, R, G, B uint8) {
+//	_ = renderer.SetDrawColor(R, G, B, 0)
+//	_ = renderer.FillRect(&sdl.Rect{
+//		X: X,
+//		Y: Y,
+//		W: W,
+//		H: H,
+//	})
+//	//updateScreen()
+//}
+
+var currentFillColor sdl.Color
+
+func setFillColor(r, g, b uint8) {
+	color := sdl.Color{R: r, G: g, B: b, A: 255}
+	if color != currentFillColor {
+		renderer.SetDrawColor(r, g, b, 255)
+		currentFillColor = color
+	}
 }
+
+func drawFillRect(x, y, w, h int32, r, g, b uint8) {
+	setFillColor(r, g, b)
+	rect := sdl.Rect{X: x, Y: y, W: w, H: h}
+	renderer.FillRect(&rect)
+}
+
 func wipeLeft(R, G, B uint8) {
 	var i int32 = 0
 	//Mid to left full length screen wipe
