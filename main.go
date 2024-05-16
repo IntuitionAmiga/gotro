@@ -28,13 +28,13 @@ func main() {
 	var _ = sdl.PollEvent() //MacOS won't draw the window without this line
 
 	//Start intro
-	_ = showKickstart()
-	playFloppySounds()
-	time.Sleep(time.Second * 2)
-
-	backgroundFill(255, 255, 255) //Fill bg with white
-	time.Sleep(time.Second * 9)
-	decrunch(100)
+	//_ = showKickstart()
+	//playFloppySounds()
+	//time.Sleep(time.Second * 2)
+	//
+	//backgroundFill(255, 255, 255) //Fill bg with white
+	//time.Sleep(time.Second * 9)
+	//decrunch(100)
 
 	playMusic()
 
@@ -482,7 +482,10 @@ func horizontalBars(R1, G1, B1, R2, G2, B2 uint8) {
 		drawFillRect(windowWidth-i, 300, 60, 60, R2, G2, B2)
 		drawFillRect(windowWidth-i, 420, 60, 60, R2, G2, B2)
 		drawFillRect(windowWidth-i, 540, 60, 60, R2, G2, B2)
-		updateScreen()
+		// Update the screen periodically to maintain animation
+		if i%2 == 0 {
+			updateScreen()
+		}
 	}
 }
 func horizontalBars2(R1, G1, B1, R2, G2, B2 uint8) {
