@@ -506,7 +506,10 @@ func horizontalBars2(R1, G1, B1, R2, G2, B2 uint8) {
 		drawFillRect(0+i, 240, 60, 60, R2, G2, B2)
 		drawFillRect(0+i, 360, 60, 60, R2, G2, B2)
 		drawFillRect(0+i, 480, 60, 60, R2, G2, B2)
-		updateScreen()
+		// Update the screen periodically to maintain animation
+		if i%2 == 0 {
+			updateScreen()
+		}
 	}
 }
 func updateScreen() {
