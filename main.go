@@ -28,14 +28,14 @@ func main() {
 	var _ = sdl.PollEvent() //MacOS won't draw the window without this line
 
 	//Start intro
-	_ = showKickstart()
-	playFloppySounds()
-	time.Sleep(time.Second * 2)
-
-	backgroundFill(255, 255, 255) //Fill bg with white
-	time.Sleep(time.Second * 9)
-	decrunch(100)
-
+	//_ = showKickstart()
+	//playFloppySounds()
+	//time.Sleep(time.Second * 2)
+	//
+	//backgroundFill(255, 255, 255) //Fill bg with white
+	//time.Sleep(time.Second * 9)
+	//decrunch(100)
+	//
 	playMusic()
 
 	wipeLeft(255, 0, 90)
@@ -241,10 +241,6 @@ func playMusic() {
 	}
 }
 
-//	func drawPixel(xpos, ypos int32, R, G, B uint8) {
-//		_ = renderer.SetDrawColor(R, G, B, 255)
-//		_ = renderer.DrawPoint(xpos, ypos)
-//	}
 var currentColor sdl.Color
 
 func setDrawColor(r, g, b uint8) {
@@ -259,17 +255,6 @@ func drawPixel(x, y int32, r, g, b uint8) {
 	setDrawColor(r, g, b)
 	renderer.DrawPoint(x, y)
 }
-
-//func drawFillRect(X, Y, W, H int32, R, G, B uint8) {
-//	_ = renderer.SetDrawColor(R, G, B, 0)
-//	_ = renderer.FillRect(&sdl.Rect{
-//		X: X,
-//		Y: Y,
-//		W: W,
-//		H: H,
-//	})
-//	//updateScreen()
-//}
 
 var currentFillColor sdl.Color
 
@@ -290,19 +275,28 @@ func drawFillRect(x, y, w, h int32, r, g, b uint8) {
 func wipeLeft(R, G, B uint8) {
 	var i int32 = 0
 	//Mid to left full length screen wipe
+	renderer.Clear()
 	for i = 0; i <= (windowWidth / 2); i++ {
 		drawFillRect((windowWidth/2)-i, 0, i, windowHeight, R, G, B)
-		updateScreen()
+		// Update the screen periodically to maintain animation
+		if i%2 == 0 {
+			updateScreen()
+		}
 	}
 }
+
 func wipeRight(R, G, B uint8) {
 	var i int32 = 0
 	//Mid to left full length screen wipe
 	for i = 0; i <= (windowWidth / 2); i++ {
 		drawFillRect(windowWidth/2, 0, i+1, windowHeight, R, G, B)
-		updateScreen()
+		// Update the screen periodically to maintain animation
+		if i%2 == 0 {
+			updateScreen()
+		}
 	}
 }
+
 func drawSprite(x, y int32, R, G, B uint8) {
 	src := sdl.Rect{W: 455, H: 456}
 	dst := sdl.Rect{X: x, Y: y, W: 128, H: 128}
@@ -314,29 +308,29 @@ func drawSprite(x, y int32, R, G, B uint8) {
 	//renderer.Present()
 	updateScreen()
 }
+
 func boingBall(R, G, B uint8) {
-	_ = renderer.Clear()
 	var xPos, yPos int
 	for i := 0; i <= (windowHeight - 128); i++ {
 		drawSprite(int32(i), int32(i), R, G, B)
 		xPos = i
 		yPos = i
-		//fmt.Println("X:", i, "Y:", yPos)
 	}
 	for i := xPos; i <= (windowWidth - 128); i++ {
 		drawSprite(int32(i), int32(yPos+10), R, G, B)
 		yPos -= 1
 		xPos = i
-		//fmt.Println("X:", i, "Y:", yPos)
 	}
 	for i := yPos; i >= 0; i-- {
-		drawSprite(int32(xPos+i), int32(yPos), R, G, B)
-		yPos -= 1
+		drawSprite(int32(xPos+i), int32(i), R, G, B)
+		//yPos -= 1
+		//xPos = i
 		xPos = i
+		yPos = -i
 
-		//fmt.Println("X:", i, "Y:", yPos)
 	}
 }
+
 func rasterBars() {
 	var startX int32 = windowWidth
 	var redY int32 = 0
@@ -364,6 +358,7 @@ func rasterBars() {
 			updateScreen()
 		}
 	}
+
 	greenBar := func() {
 		for i := int32(0); i <= 35; i++ {
 			//Green
