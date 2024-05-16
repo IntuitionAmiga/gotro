@@ -38,33 +38,34 @@ func main() {
 
 	playMusic()
 
-	wipeLeft(255, 0, 90)
-	wipeRight(0, 120, 128)
-	horizontalBars2(30, 0, 95, 30, 055, 200)
-	wipeLeft(0, 120, 128)
-	wipeRight(255, 0, 90)
-	wipeLeft(255, 0, 90)
-
-	boingBall(255, 0, 90)
-
+	//wipeLeft(255, 0, 90)
+	//wipeRight(0, 120, 128)
+	//horizontalBars2(30, 0, 95, 30, 055, 200)
+	//wipeLeft(0, 120, 128)
+	//wipeRight(255, 0, 90)
+	//wipeLeft(255, 0, 90)
+	//
+	//boingBall(255, 0, 90)
+	//
 	rasterBars()
 	rainbowScroll()
-
+	//
 	wipeTopDown(0, 0, 0)
 	drawBubbles()
+	wipeTopDown(0, 0, 0)
 
-	wipeLeft(95, 95, 0)
-	wipeRight(0, 95, 0)
+	//wipeLeft(95, 95, 0)
+	//wipeRight(0, 95, 0)
 
 	horizontalBars(0, 0, 95, 0, 055, 200)
-	horizontalBars(30, 0, 95, 30, 055, 200)
+	//horizontalBars(30, 0, 95, 30, 055, 200)
 
-	wipeLeft(0, 0, 0)
-	wipeRight(0, 0, 0)
+	wipeTopDown(0, 0, 0)
+	//wipeLeft(0, 0, 0)
+	//wipeRight(0, 0, 0)
 
 	_ = renderer.Destroy()
 	_ = window.Destroy()
-
 }
 func sdlInitVideo() {
 	err := sdl.Init(sdl.INIT_EVERYTHING)
@@ -287,6 +288,7 @@ func wipeLeft(R, G, B uint8) {
 
 func wipeRight(R, G, B uint8) {
 	var i int32 = 0
+	renderer.Clear()
 	//Mid to left full length screen wipe
 	for i = 0; i <= (windowWidth / 2); i++ {
 		drawFillRect(windowWidth/2, 0, i+1, windowHeight, R, G, B)
@@ -404,6 +406,7 @@ func rasterBars() {
 }
 func rainbowScroll() {
 	var startY int32 = windowHeight/2 + 16
+	renderer.Clear()
 	for i := 0; i < windowWidth; i++ {
 		drawFillRect(windowWidth-int32(i), startY-48, 30, 16, 255, 0, 0)
 		drawFillRect(windowWidth-int32(i), startY-32, 30, 16, 255, 127, 0)
@@ -412,12 +415,16 @@ func rainbowScroll() {
 		drawFillRect(windowWidth-int32(i), startY+16, 30, 16, 0, 0, 255)
 		drawFillRect(windowWidth-int32(i), startY+32, 30, 16, 46, 43, 95)
 		drawFillRect(windowWidth-int32(i), startY+48, 30, 16, 139, 0, 255)
-		updateScreen()
+		// Update the screen periodically to maintain animation
+		if i%2 == 0 {
+			updateScreen()
+		}
 	}
 }
 func wipeTopDown(R, G, B uint8) {
 	var i int32
 	//Clear top to bottom
+	renderer.Clear()
 	for i = 1; i <= windowHeight; i++ {
 		drawFillRect(0, 0, windowWidth, 0+i, R, G, B)
 		// Update the screen periodically to maintain animation
@@ -453,18 +460,18 @@ func drawCircle(x0, y0, r int32, R, G, B uint8) {
 			err += dx - (r * 2)
 		}
 	}
-	//renderer.Present()
-	//updateScreen()
-
 }
 func drawBubbles() {
 	_ = renderer.SetDrawColor(0, 0, 0, 0)
 	_ = renderer.Clear()
 	for i := 0; i <= 300; i++ {
 		drawCircle(int32(rand.Intn(800)), int32(rand.Intn(600)), int32(rand.Intn(80)), uint8(rand.Intn(255)), uint8(rand.Intn(255)), uint8(rand.Intn(255)))
-		updateScreen()
+		// Update the screen periodically to maintain animation
+		if i%2 == 0 {
+			updateScreen()
+		}
+		time.Sleep(time.Second / 500)
 	}
-	time.Sleep(time.Second)
 }
 func horizontalBars(R1, G1, B1, R2, G2, B2 uint8) {
 	var i int32
