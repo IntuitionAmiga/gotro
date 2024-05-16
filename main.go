@@ -28,14 +28,14 @@ func main() {
 	var _ = sdl.PollEvent() //MacOS won't draw the window without this line
 
 	//Start intro
-	//_ = showKickstart()
-	//playFloppySounds()
-	//time.Sleep(time.Second * 2)
-	//
-	//backgroundFill(255, 255, 255) //Fill bg with white
-	//time.Sleep(time.Second * 9)
-	//decrunch(100)
-	//
+	_ = showKickstart()
+	playFloppySounds()
+	time.Sleep(time.Second * 2)
+
+	backgroundFill(255, 255, 255) //Fill bg with white
+	time.Sleep(time.Second * 9)
+	decrunch(100)
+
 	playMusic()
 
 	wipeLeft(255, 0, 90)
@@ -305,7 +305,6 @@ func drawSprite(x, y int32, R, G, B uint8) {
 	_ = renderer.SetDrawColor(R, G, B, 255)
 	_ = renderer.Clear()
 	_ = renderer.Copy(texture, &src, &dst)
-	//renderer.Present()
 	updateScreen()
 }
 
@@ -323,11 +322,8 @@ func boingBall(R, G, B uint8) {
 	}
 	for i := yPos; i >= 0; i-- {
 		drawSprite(int32(xPos+i), int32(i), R, G, B)
-		//yPos -= 1
-		//xPos = i
 		xPos = i
 		yPos = -i
-
 	}
 }
 
@@ -424,9 +420,13 @@ func wipeTopDown(R, G, B uint8) {
 	//Clear top to bottom
 	for i = 1; i <= windowHeight; i++ {
 		drawFillRect(0, 0, windowWidth, 0+i, R, G, B)
-		updateScreen()
+		// Update the screen periodically to maintain animation
+		if i%2 == 0 {
+			updateScreen()
+		}
 	}
 }
+
 func drawCircle(x0, y0, r int32, R, G, B uint8) {
 	var x, y, dx, dy int32 = r - 1, 0, 1, 1
 	var err = dx - (r * 2)
